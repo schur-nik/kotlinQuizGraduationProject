@@ -1,0 +1,61 @@
+package com.example.kotlinquizgraduationproject.ui.feature.LevelsScreen
+
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.kotlinquizgraduationproject.ui.feature.LevelsScreen.domain.LevelsAction
+import com.example.kotlinquizgraduationproject.ui.feature.LevelsScreen.domain.LevelsResult
+import com.example.kotlinquizgraduationproject.ui.feature.LevelsScreen.domain.LevelsState
+import com.example.kotlinquizgraduationproject.ui.feature.LevelsScreen.domain.usecases.LoadQuestionCategoriesUseCase
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.launch
+import javax.inject.Inject
+
+@HiltViewModel
+class LevelsViewModel @Inject constructor(
+    private val loadQuestionCategoriesUseCase: LoadQuestionCategoriesUseCase
+) : ViewModel() {
+
+    val state = MutableStateFlow(LevelsState())
+
+    init {
+        processedAction(LevelsAction.Init)
+    }
+
+    private fun processedAction(action: LevelsAction) {
+        viewModelScope.launch {
+            when (action) {
+                is LevelsAction.Init -> loadQuestionCategoriesUseCase.loadListOfQuestionCategories()
+            }.collect { result ->
+                handleResult(result)
+            }
+        }
+
+    }
+
+    private suspend fun handleResult(result: LevelsResult) {
+        when (result) {
+            is LevelsResult.Loading -> {
+                state.emit(state.value.copy(isLoading = true))
+            }
+
+            is LevelsResult.QuestionCategoriesListLoaded -> {
+                state.emit(
+                    state.value.copy(
+                        isLoading = false,
+                        listCategory = result.list
+                    )
+                )
+            }
+
+            is LevelsResult.Failure -> {
+                state.emit(
+                    state.value.copy(
+                        isLoading = false,
+                    )
+                )
+            }
+        }
+    }
+
+}

@@ -4,10 +4,10 @@ sealed class Routes(val route: String) {
 
     data object MenuScreen : Routes("MenuScreen")
     data object LevelsScreen : Routes("LevelsScreen")
-//    data object CharacterDetail : Routes("Characters/{id}") {
-//        fun createRoute(id: String): String {
-//            return "Characters/$id"
-//        }
-//    }
+    data object QuizScreen : Routes("QuizScreen/{difficulty}&{category}") {
+        fun createRoute(difficulty: String, category: String): String {
+            return "QuizScreen/$difficulty&$category"
+        }
+    }
 
 }

@@ -20,9 +20,9 @@ class LoadQuestionsUseCase @Inject constructor(
             if (responseQuestionForLevel.isSuccessful) {
                 val questions = responseQuestionForLevel.body()?.map { questionItem ->
                     Question(
-                        questionItem.correctAnswer,
-                        questionItem.incorrectAnswers,
-                        questionItem.question.text
+                        correctAnswer = questionItem.correctAnswer,
+                        allAnswers = (questionItem.incorrectAnswers+questionItem.correctAnswer).shuffled(),
+                        question = questionItem.question.text
                     )
                 } ?: emptyList()
                 emit(QuizResult.QuestionListLoaded(questions))

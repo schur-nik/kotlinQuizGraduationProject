@@ -6,7 +6,7 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
-import com.example.kotlinquizgraduationproject.model.LevelInformation
+import com.example.kotlinquizgraduationproject.model.quizinfo.LevelInformation
 import com.example.kotlinquizgraduationproject.ui.feature.LevelsScreen.LevelsScreen
 import com.example.kotlinquizgraduationproject.ui.feature.MenuScreen.MenuScreen
 import com.example.kotlinquizgraduationproject.ui.feature.QuizScreen.QuizScreen

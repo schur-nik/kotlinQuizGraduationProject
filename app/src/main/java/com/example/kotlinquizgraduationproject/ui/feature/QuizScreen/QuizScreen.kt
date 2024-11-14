@@ -2,8 +2,10 @@ package com.example.kotlinquizgraduationproject.ui.feature.QuizScreen
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -15,6 +17,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -27,15 +30,41 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import com.example.kotlinquizgraduationproject.model.LevelInformation
+import com.example.kotlinquizgraduationproject.model.quizinfo.LevelInformation
+import com.example.kotlinquizgraduationproject.model.quizinfo.Question
+import com.example.kotlinquizgraduationproject.network.QuizApi
+import com.example.kotlinquizgraduationproject.network.entity.Categories.MetadataResponse
+import com.example.kotlinquizgraduationproject.network.entity.Questions.ListQuestionsResponse
+import com.example.kotlinquizgraduationproject.repository.ApiRepository
 import com.example.kotlinquizgraduationproject.ui.feature.QuizScreen.domain.QuizAction
+import com.example.kotlinquizgraduationproject.ui.feature.QuizScreen.domain.usecases.LoadQuestionsUseCase
 import com.example.kotlinquizgraduationproject.ui.navigation.Routes
+import retrofit2.Response
+
+class FakeQuizRepository {
+    fun test() : ApiRepository {
+        return ApiRepository(FakeQuizApi())
+    }
+}
+
+class FakeQuizApi : QuizApi {
+    override suspend fun getListQuestions(difficulties: String, categories: String): Response<ListQuestionsResponse> {
+        return Response.success(ListQuestionsResponse())
+    }
+
+    override suspend fun getListOfQuestionCategories(): Response<MetadataResponse> {
+        return TODO("Provide the return value")
+    }
+}
 
 @Preview(showBackground = true)
 @Composable
 fun QuizScreenPreview() {
     val navController = rememberNavController()
-    QuizScreen(LevelInformation("easy", "science"), navHostController = navController)
+    QuizScreen(
+        LevelInformation("easy", "science"),
+        navHostController = navController,
+        viewModel = QuizViewModel(LoadQuestionsUseCase(FakeQuizRepository().test())))
 }
 
 @Composable
@@ -46,7 +75,9 @@ fun QuizScreen(
 ) {
 
     val state by viewModel.state.collectAsState()
-    viewModel.processedAction(QuizAction.Init(levelInformation))
+    LaunchedEffect(levelInformation) {
+        viewModel.processedAction(QuizAction.Init(levelInformation))
+    }
 
     Scaffold(
         content = { paddingValues ->
@@ -55,14 +86,17 @@ fun QuizScreen(
                     .padding(paddingValues)
                     .fillMaxSize()
             ) {
-                Text(text = "category=" + levelInformation.category)
-                Text(text = "category=" + levelInformation.difficulty)
+//                Text(text = "category=" + levelInformation.category)
+//                Text(text = "category=" + levelInformation.difficulty)
                 state.run {
-                    Text(text = "currentNumber=" + state.currentNumber)
-                    Text(text = "size=" + state.questionList.size)
-                    Text(text = "userAnswer=" + state.userAnswer)
-                    Text(text = "correctAnswer=" + state.currentQuestion?.correctAnswer)
-                    Text(text = "endQuiz=" + state.endQuiz)
+                    val currentQuestion = Question("1", listOf("1", "2", "3", "4"), "Questiuon is here")
+//                    val userAnswer = "1"
+                    val questionList = listOf(Question("1", listOf("1", "2", "3", "4"), "Questiuon is here"))
+//                    Text(text = "currentNumber=" + state.currentNumber)
+//                    Text(text = "size=" + state.questionList.size)
+//                    Text(text = "userAnswer=" + state.userAnswer)
+//                    Text(text = "correctAnswer=" + state.currentQuestion?.correctAnswer)
+//                    Text(text = "endQuiz=" + state.endQuiz)
                     if (state.isLoading) {
                         CircularProgressIndicator(
                             modifier = Modifier
@@ -71,12 +105,21 @@ fun QuizScreen(
                         )
                     }
                     if (endQuiz) {
-                        Text(text = "QUIZ IS END")
-                        Button(onClick = { navHostController.navigate(Routes.LevelsScreen.route) }) {
-                            Text(text = "TO MENU")
+                        Column(
+                            modifier = Modifier
+                                .align(Alignment.CenterHorizontally)
+                                .padding(top = 160.dp),
+                            verticalArrangement = Arrangement.Center,
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Text(text = "QUIZ IS END")
+                            Spacer(modifier = Modifier.height(16.dp))
+                            Button(onClick = { navHostController.navigate(Routes.LevelsScreen.route) }) {
+                                Text(text = "TO MENU")
+                            }
                         }
                     }
-                    if (questionList.isNotEmpty() && !endQuiz && currentQuestion != null) {
+                    if (currentQuestion != null) {
                         Column(
                             modifier = Modifier
                                 .align(Alignment.CenterHorizontally)
@@ -84,7 +127,7 @@ fun QuizScreen(
                                 .padding(15.dp)
                         )
                         {
-                            Text(text = currentQuestion.question, fontSize = 20.sp)
+                            Text(text = currentQuestion.question, fontSize = 20.sp, minLines = 5)
                             LazyVerticalGrid(
                                 modifier = Modifier.padding(top = 24.dp),
                                 columns = GridCells.Fixed(2)
@@ -94,9 +137,9 @@ fun QuizScreen(
                                         QuestionBox(
                                             answer = currentQuestion.allAnswers[answer],
                                             correctAnswer = currentQuestion.correctAnswer,
-                                            userAnswer = state.userAnswer,
+                                            userAnswer = userAnswer,
                                             onClick = {
-                                                if (state.userAnswer == null) {
+                                                if (userAnswer == null) {
                                                     viewModel.processedAction(
                                                         QuizAction.AnswerQuestion(
                                                             currentQuestion.allAnswers[answer]
@@ -114,7 +157,8 @@ fun QuizScreen(
                                 Text(text = "NEXT")
                             }
                         }
-                    } else {
+                    }
+                    if (questionList.isEmpty()) {
                         Text(text = "NO_DATA_FOUND")
                     }
                 }

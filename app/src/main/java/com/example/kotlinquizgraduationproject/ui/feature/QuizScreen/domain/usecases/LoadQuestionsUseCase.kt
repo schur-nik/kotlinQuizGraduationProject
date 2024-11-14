@@ -1,8 +1,8 @@
 package com.example.kotlinquizgraduationproject.ui.feature.QuizScreen.domain.usecases
 
-import com.example.kotlinquizgraduationproject.model.LevelInformation
-import com.example.kotlinquizgraduationproject.model.Question
-import com.example.kotlinquizgraduationproject.repository.QuizRepository
+import com.example.kotlinquizgraduationproject.model.quizinfo.LevelInformation
+import com.example.kotlinquizgraduationproject.model.quizinfo.Question
+import com.example.kotlinquizgraduationproject.repository.ApiRepository
 import com.example.kotlinquizgraduationproject.ui.feature.QuizScreen.domain.QuizResult
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
@@ -10,13 +10,13 @@ import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
 class LoadQuestionsUseCase @Inject constructor(
-    private val quizRepository: QuizRepository
+    private val apiRepository: ApiRepository
 ) {
 
     fun loadQuestionList(levelInformation: LevelInformation): Flow<QuizResult> {
         return flow {
             emit(QuizResult.Loading)
-            val responseQuestionForLevel = quizRepository.getListQuestions(levelInformation)
+            val responseQuestionForLevel = apiRepository.getListQuestions(levelInformation)
             if (responseQuestionForLevel.isSuccessful) {
                 val questions = responseQuestionForLevel.body()?.map { questionItem ->
                     Question(

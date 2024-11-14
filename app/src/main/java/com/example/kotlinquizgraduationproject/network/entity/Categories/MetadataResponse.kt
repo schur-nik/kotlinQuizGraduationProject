@@ -1,4 +1,4 @@
-package com.example.kotlinquizgraduationproject.network.entity.Catefories
+package com.example.kotlinquizgraduationproject.network.entity.Categories
 
 import com.google.gson.annotations.SerializedName
 

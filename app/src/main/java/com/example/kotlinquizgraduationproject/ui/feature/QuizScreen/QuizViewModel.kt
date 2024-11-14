@@ -1,15 +1,13 @@
 package com.example.kotlinquizgraduationproject.ui.feature.QuizScreen
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.kotlinquizgraduationproject.model.LevelInformation
+import com.example.kotlinquizgraduationproject.model.quizinfo.LevelInformation
 import com.example.kotlinquizgraduationproject.ui.feature.QuizScreen.domain.QuizAction
 import com.example.kotlinquizgraduationproject.ui.feature.QuizScreen.domain.QuizResult
 import com.example.kotlinquizgraduationproject.ui.feature.QuizScreen.domain.QuizState
 import com.example.kotlinquizgraduationproject.ui.feature.QuizScreen.domain.usecases.LoadQuestionsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
@@ -71,15 +69,12 @@ class QuizViewModel @Inject constructor(
             }
 
             is QuizResult.QuestionNext -> {
-                Log.e("state.value.questionList.size", state.value.questionList.size.toString())
-                Log.e("state.value.currentNumber", state.value.currentNumber.toString())
                 if (state.value.questionList.size <= state.value.currentNumber+1)
                 {
                     state.emit(
                         state.value.copy(
-//                            currentNumber = state.value.currentNumber + 1,
-//                            currentQuestion = result.question,
-//                            userAnswer = null,
+                            currentQuestion = null,
+                            userAnswer = null,
                             endQuiz = true
                         )
                     )

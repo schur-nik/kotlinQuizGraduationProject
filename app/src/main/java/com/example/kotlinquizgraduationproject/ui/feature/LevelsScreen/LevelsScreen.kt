@@ -27,18 +27,16 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.kotlinquizgraduationproject.network.QuizApi
-import com.example.kotlinquizgraduationproject.network.entity.Catefories.MetadataResponse
+import com.example.kotlinquizgraduationproject.network.entity.Categories.MetadataResponse
 import com.example.kotlinquizgraduationproject.network.entity.Questions.ListQuestionsResponse
-import com.example.kotlinquizgraduationproject.network.entity.Questions.QuestionItem
-import com.example.kotlinquizgraduationproject.network.entity.Questions.QuestionText
-import com.example.kotlinquizgraduationproject.repository.QuizRepository
+import com.example.kotlinquizgraduationproject.repository.ApiRepository
 import com.example.kotlinquizgraduationproject.ui.feature.LevelsScreen.domain.usecases.LoadQuestionCategoriesUseCase
 import com.example.kotlinquizgraduationproject.ui.navigation.Routes
 import retrofit2.Response
 
 class FakeQuizRepository {
-    fun test() : QuizRepository {
-        return QuizRepository(FakeQuizApi())
+    fun test() : ApiRepository {
+        return ApiRepository(FakeQuizApi())
     }
 }
 

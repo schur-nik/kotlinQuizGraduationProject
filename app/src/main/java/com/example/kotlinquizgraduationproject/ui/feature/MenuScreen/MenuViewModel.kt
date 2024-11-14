@@ -1,13 +1,13 @@
 package com.example.kotlinquizgraduationproject.ui.feature.MenuScreen
 
 import androidx.lifecycle.ViewModel
-import com.example.kotlinquizgraduationproject.repository.QuizRepository
+import com.example.kotlinquizgraduationproject.repository.ApiRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
 @HiltViewModel
 class MenuViewModel @Inject constructor(
-    private val quizRepository: QuizRepository
+    private val apiRepository: ApiRepository
 ) : ViewModel() {
 
 //    fun test() {

@@ -1,6 +1,6 @@
 package com.example.kotlinquizgraduationproject.network
 
-import com.example.kotlinquizgraduationproject.network.entity.Catefories.MetadataResponse
+import com.example.kotlinquizgraduationproject.network.entity.Categories.MetadataResponse
 import com.example.kotlinquizgraduationproject.network.entity.Questions.ListQuestionsResponse
 import retrofit2.Response
 import retrofit2.http.GET

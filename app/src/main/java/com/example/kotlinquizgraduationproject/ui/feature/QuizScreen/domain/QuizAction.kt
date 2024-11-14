@@ -1,6 +1,6 @@
 package com.example.kotlinquizgraduationproject.ui.feature.QuizScreen.domain
 
-import com.example.kotlinquizgraduationproject.model.LevelInformation
+import com.example.kotlinquizgraduationproject.model.quizinfo.LevelInformation
 
 sealed class QuizAction {
 

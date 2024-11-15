@@ -6,6 +6,8 @@ import com.example.kotlinquizgraduationproject.model.quizinfo.LevelInformation
 import com.example.kotlinquizgraduationproject.ui.feature.QuizScreen.domain.QuizAction
 import com.example.kotlinquizgraduationproject.ui.feature.QuizScreen.domain.QuizResult
 import com.example.kotlinquizgraduationproject.ui.feature.QuizScreen.domain.QuizState
+import com.example.kotlinquizgraduationproject.ui.feature.QuizScreen.domain.usecases.AnswerQuestionUseCase
+import com.example.kotlinquizgraduationproject.ui.feature.QuizScreen.domain.usecases.FinishQuizUseCase
 import com.example.kotlinquizgraduationproject.ui.feature.QuizScreen.domain.usecases.LoadQuestionsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -15,21 +17,25 @@ import javax.inject.Inject
 
 @HiltViewModel
 class QuizViewModel @Inject constructor(
-    private val loadQuestionsUseCase: LoadQuestionsUseCase
+    private val loadQuestionsUseCase: LoadQuestionsUseCase,
+    private val answerQuestionUseCase: AnswerQuestionUseCase,
+    private val finishQuizUseCase: FinishQuizUseCase
 ) : ViewModel() {
 
     val state = MutableStateFlow(QuizState())
+    private val levelInformation = LevelInformation("", "")
 
     init {
-        processedAction(QuizAction.Init(LevelInformation(null, null)))
+        processedAction(QuizAction.Init(levelInformation))
     }
 
     fun processedAction(action: QuizAction) {
         viewModelScope.launch {
             when (action) {
                 is QuizAction.Init -> loadQuestionsUseCase.loadQuestionList(action.levelInformation)
-                is QuizAction.AnswerQuestion -> flowOf(QuizResult.QuestionDone(action.answer))
+                is QuizAction.AnswerQuestion -> answerQuestionUseCase.answerQuestion(action.answer, state.value.currentQuestion)
                 is QuizAction.NextQuestion -> flowOf(QuizResult.QuestionNext(state.value.currentNumber))
+                is QuizAction.FinishQuiz -> finishQuizUseCase.finishQuiz(levelInformation, state.value.correctAnswersCount)
             }.collect { result ->
                 handleResult(result)
             }
@@ -46,8 +52,10 @@ class QuizViewModel @Inject constructor(
                 state.emit(
                     state.value.copy(
                         isLoading = false,
+                        questionCount = result.list.size,
                         questionList = result.list,
-                        currentQuestion = result.list.firstOrNull()
+                        currentQuestion = result.list.firstOrNull(),
+                        currentNumber = 0
                     )
                 )
             }
@@ -63,32 +71,40 @@ class QuizViewModel @Inject constructor(
             is QuizResult.QuestionDone -> {
                 state.emit(
                     state.value.copy(
-                        userAnswer = result.answer
+                        userAnswer = result.answer,
+                        correctAnswersCount = if (result.isCorrect) {
+                            state.value.correctAnswersCount.inc()
+                        } else {
+                            state.value.correctAnswersCount
+                        }
                     )
                 )
             }
 
             is QuizResult.QuestionNext -> {
-                if (state.value.questionList.size <= state.value.currentNumber+1)
-                {
-                    state.emit(
-                        state.value.copy(
-                            currentQuestion = null,
-                            userAnswer = null,
-                            endQuiz = true
-                        )
+                val nextNumber = state.value.currentNumber + 1
+                state.emit(
+                    state.value.copy(
+                        currentNumber = nextNumber,
+                        currentQuestion = state.value.questionList[nextNumber],
+                        userAnswer = null
                     )
-                }
-                else {
-                    state.emit(
-                        state.value.copy(
-                            currentNumber = state.value.currentNumber + 1,
-                            currentQuestion = state.value.questionList[state.value.currentNumber + 1],
-                            userAnswer = null
-                        )
-                    )
-                }
+                )
             }
+
+            is QuizResult.FinishQuiz -> {
+                state.emit(
+                    state.value.copy(
+                        questionCount = 0,
+                        questionList = arrayListOf(),
+                        currentQuestion = null,
+                        currentNumber = 0,
+                        userAnswer = null,
+                        endQuiz = true
+                    )
+                )
+            }
+
         }
     }
 

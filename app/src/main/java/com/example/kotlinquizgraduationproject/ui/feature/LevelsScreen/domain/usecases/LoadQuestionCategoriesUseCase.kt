@@ -1,5 +1,6 @@
 package com.example.kotlinquizgraduationproject.ui.feature.LevelsScreen.domain.usecases
 
+import com.example.kotlinquizgraduationproject.model.quizinfo.Category
 import com.example.kotlinquizgraduationproject.repository.ApiRepository
 import com.example.kotlinquizgraduationproject.ui.feature.LevelsScreen.domain.LevelsResult
 import kotlinx.coroutines.flow.Flow
@@ -17,7 +18,7 @@ class LoadQuestionCategoriesUseCase @Inject constructor(
             val responseAllCategory = apiRepository.getListOfQuestionCategories()
             if (responseAllCategory.isSuccessful) {
                 val categories = responseAllCategory.body()?.category?.map { categoryItem ->
-                    categoryItem.key
+                    Category(categoryItem.key)
                 } ?: emptyList()
                 emit(LevelsResult.QuestionCategoriesListLoaded(categories))
             } else {

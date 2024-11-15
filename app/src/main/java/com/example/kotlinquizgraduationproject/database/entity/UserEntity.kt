@@ -6,17 +6,15 @@ import androidx.room.Index
 import androidx.room.PrimaryKey
 
 @Entity(
-    tableName = "UsersInfo",
+    tableName = "Users",
     indices = [
-        Index("id", unique = true)
+        Index("u_id", unique = true)
     ]
 )
 data class UserEntity(
-    @PrimaryKey
-    @ColumnInfo("r_id")
+    @PrimaryKey(autoGenerate = true)
+    @ColumnInfo("u_id")
     val id: Int,
     @ColumnInfo("name")
-    val name: String,
-//    val favoriteCategory:
-//    val progress: List<LevelProgressEntity>
+    val name: String
 )

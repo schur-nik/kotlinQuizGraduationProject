@@ -10,8 +10,10 @@ sealed class QuizResult {
 
     data class Failure(val error: Throwable? = null) : QuizResult()
 
-    data class QuestionDone(val answer: String) : QuizResult()
+    data class QuestionDone(val answer: String, val isCorrect: Boolean) : QuizResult()
 
     data class QuestionNext(val currentNumber: Int) : QuizResult()
+
+    data object FinishQuiz : QuizResult()
 
 }

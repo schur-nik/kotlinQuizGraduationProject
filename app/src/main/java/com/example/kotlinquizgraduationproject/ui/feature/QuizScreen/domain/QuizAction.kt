@@ -10,4 +10,6 @@ sealed class QuizAction {
 
     data object NextQuestion : QuizAction()
 
+    data object FinishQuiz : QuizAction()
+
 }

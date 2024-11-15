@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">kotlinQuizGraduationProject</string>
+    <string name="title_activity_main">MainActivity</string>
+    <string name="greating">Добро пожаловать в Quiz!</string>
+
+    <string name="sport_and_leisure">Спорт и отдых</string>
+    <string name="science">Наука</string>
+    <string name="food_and_drink">Еда и напитки</string>
+    <string name="music">Музыка</string>
+    <string name="general_knowledge">Общая культура</string>
+    <string name="history">История</string>
+    <string name="arts_and_literature">Искусство и литература</string>
+    <string name="film_and_tv">Фильмы и телевидение</string>
+    <string name="society_and_culture">Общество и культура</string>
+    <string name="geography">География</string>
+
+</resources>

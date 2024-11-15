@@ -16,11 +16,6 @@
         android:theme="@style/Theme.KotlinQuizGraduationProject"
         tools:targetApi="31" >
         <activity
-            android:name=".ui.feature.LevelsScreen.MainActivity"
-            android:exported="false"
-            android:label="@string/title_activity_main"
-            android:theme="@style/Theme.KotlinQuizGraduationProject" />
-        <activity
             android:name=".ui.MainActivity"
             android:exported="true"
             android:label="@string/app_name"

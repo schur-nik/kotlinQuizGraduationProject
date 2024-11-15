@@ -32,7 +32,7 @@ fun AppGraph(
 
             val difficulty = backStack.arguments?.getString("difficulty")
             val category = backStack.arguments?.getString("category")
-            val levelInformation = LevelInformation(difficulty, category)
+            val levelInformation = LevelInformation(difficulty.orEmpty(), category.orEmpty())
             QuizScreen(levelInformation, navController)
         }
     }

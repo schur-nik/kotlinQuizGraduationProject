@@ -8,4 +8,15 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="main_blue">#0273CA</color>
+
+    <color name="sport_theme">#5466CA02</color>
+    <color name="science_theme">#43048AF1</color>
+    <color name="food_theme">#65C3AF01</color>
+    <color name="music_theme">#5E5F02CA</color>
+    <color name="general_theme">#65971418</color>
+    <color name="history_theme">#6AF15704</color>
+    <color name="literature_theme">#6504B34A</color>
+    <color name="film_theme">#5E4D02A3</color>
+    <color name="society_theme">#65FAE851</color>
+    <color name="geography_theme">#5E4689ED</color>
 </resources>

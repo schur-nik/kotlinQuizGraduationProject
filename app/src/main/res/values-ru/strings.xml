@@ -8,11 +8,16 @@
     <string name="science">Наука</string>
     <string name="food_and_drink">Еда и напитки</string>
     <string name="music">Музыка</string>
-    <string name="general_knowledge">Общая культура</string>
+    <string name="general_knowledge">Общие знания</string>
     <string name="history">История</string>
     <string name="arts_and_literature">Искусство и литература</string>
     <string name="film_and_tv">Фильмы и телевидение</string>
     <string name="society_and_culture">Общество и культура</string>
     <string name="geography">География</string>
+
+    <string name="menubutton_levels">Играть!</string>
+    <string name="menubutton_profile">Профиль</string>
+    <string name="menubutton_settings">Настройка</string>
+    <string name="menubutton_exit">Выход</string>
 
 </resources>

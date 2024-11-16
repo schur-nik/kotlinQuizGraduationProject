@@ -14,4 +14,9 @@
     <string name="society_and_culture">Society and culture</string>
     <string name="geography">Geography</string>
 
+    <string name="menubutton_levels">Play!</string>
+    <string name="menubutton_profile">Profile</string>
+    <string name="menubutton_settings">Settings</string>
+    <string name="menubutton_exit">Exit</string>
+
 </resources>

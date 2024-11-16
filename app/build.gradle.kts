@@ -62,24 +62,27 @@ dependencies {
     //хилт
     implementation("com.google.dagger:hilt-android:2.49")
     ksp("com.google.dagger:hilt-android-compiler:2.49")
-    implementation("androidx.hilt:hilt-navigation-compose:1.0.0")
-    implementation("androidx.compose.runtime:runtime-livedata:1.7.2")
+    implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
+    implementation("androidx.compose.runtime:runtime-livedata:1.7.5")
 
     //флоу, наблюдатель
-    implementation("androidx.compose.runtime:runtime-livedata:1.7.2")
-    implementation("androidx.compose.runtime:runtime-rxjava2:1.7.2")
+    implementation("androidx.compose.runtime:runtime-livedata:1.7.5")
+    implementation("androidx.compose.runtime:runtime-rxjava2:1.7.5")
 
     //корутины
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.2")
 
     //навигация
-    implementation("androidx.navigation:navigation-compose:2.8.3")
+    implementation("androidx.navigation:navigation-compose:2.8.4")
 
     //room(БД)
     val room_version = "2.6.1"
     implementation("androidx.room:room-runtime:$room_version")
     ksp("androidx.room:room-compiler:$room_version")
     implementation("androidx.room:room-ktx:$room_version")
+
+    //шрифты
+    implementation("androidx.compose.ui:ui-text-google-fonts:1.7.5")
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)

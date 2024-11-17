@@ -1,5 +1,6 @@
 package com.example.kotlinquizgraduationproject.ui.feature.LevelsScreen.domain.usecases
 
+import android.util.Log
 import com.example.kotlinquizgraduationproject.model.usersinfo.LevelProgress
 import com.example.kotlinquizgraduationproject.repository.ApiRepository
 import com.example.kotlinquizgraduationproject.repository.DBRepository
@@ -16,8 +17,12 @@ class LoadLevelProgressUseCase @Inject constructor(
 
     fun loadLevelProgress(): Flow<LevelsResult> {
         return flow {
+            val allUsers = dbRepository.getAllUsers()
+            Log.e("allUsers", allUsers.toString())
+
             val responseProgress = dbRepository.getProgress(SharedPreferencesRepository.getUserId())
             val levelProgress = responseProgress.map { entity -> LevelProgress(entity.category, entity.difficulty, entity.progress) }
+            Log.e("loadLevelsProgress", levelProgress.toString())
             emit(LevelsResult.LevelsProgressLoaded(levelProgress))
         }
     }

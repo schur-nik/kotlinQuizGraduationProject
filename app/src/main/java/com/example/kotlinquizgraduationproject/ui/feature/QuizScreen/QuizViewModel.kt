@@ -35,7 +35,7 @@ class QuizViewModel @Inject constructor(
                 is QuizAction.Init -> loadQuestionsUseCase.loadQuestionList(action.levelInformation)
                 is QuizAction.AnswerQuestion -> answerQuestionUseCase.answerQuestion(action.answer, state.value.currentQuestion)
                 is QuizAction.NextQuestion -> flowOf(QuizResult.QuestionNext(state.value.currentNumber))
-                is QuizAction.FinishQuiz -> finishQuizUseCase.finishQuiz(levelInformation, state.value.correctAnswersCount)
+                is QuizAction.FinishQuiz -> finishQuizUseCase.finishQuiz(state.value.levelInformation, state.value.correctAnswersCount)
             }.collect { result ->
                 handleResult(result)
             }
@@ -55,7 +55,8 @@ class QuizViewModel @Inject constructor(
                         questionCount = result.list.size,
                         questionList = result.list,
                         currentQuestion = result.list.firstOrNull(),
-                        currentNumber = 0
+                        currentNumber = 0,
+                        levelInformation = result.levelInformation
                     )
                 )
             }

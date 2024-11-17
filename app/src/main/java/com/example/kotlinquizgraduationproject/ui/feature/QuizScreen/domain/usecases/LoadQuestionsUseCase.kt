@@ -1,5 +1,6 @@
 package com.example.kotlinquizgraduationproject.ui.feature.QuizScreen.domain.usecases
 
+import android.util.Log
 import com.example.kotlinquizgraduationproject.model.quizinfo.LevelInformation
 import com.example.kotlinquizgraduationproject.model.quizinfo.Question
 import com.example.kotlinquizgraduationproject.repository.ApiRepository
@@ -25,7 +26,7 @@ class LoadQuestionsUseCase @Inject constructor(
                         question = questionItem.question.text
                     )
                 } ?: emptyList()
-                emit(QuizResult.QuestionListLoaded(questions))
+                emit(QuizResult.QuestionListLoaded(questions, levelInformation))
             } else {
                 emit(QuizResult.Failure())
             }

@@ -1,6 +1,7 @@
 package com.example.kotlinquizgraduationproject.ui.feature.LevelsScreen
 
 import android.content.res.Configuration
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -67,49 +68,13 @@ import com.example.kotlinquizgraduationproject.network.entity.Categories.Metadat
 import com.example.kotlinquizgraduationproject.network.entity.Questions.ListQuestionsResponse
 import com.example.kotlinquizgraduationproject.repository.ApiRepository
 import com.example.kotlinquizgraduationproject.repository.DBRepository
+import com.example.kotlinquizgraduationproject.ui.fakePackage.FakeQuizRepository
+import com.example.kotlinquizgraduationproject.ui.fakePackage.FakeUserDao
 import com.example.kotlinquizgraduationproject.ui.feature.LevelsScreen.domain.usecases.LoadLevelProgressUseCase
 import com.example.kotlinquizgraduationproject.ui.feature.LevelsScreen.domain.usecases.LoadQuestionCategoriesUseCase
 import com.example.kotlinquizgraduationproject.ui.navigation.Routes
 import com.example.kotlinquizgraduationproject.utils.translateCategories
 import retrofit2.Response
-
-class FakeUserDao : UserDao {
-    override suspend fun addUser(user: UserEntity): Long {
-        TODO("Not yet implemented")
-    }
-
-    override suspend fun getUser(id: Int): UserEntity {
-        TODO("Not yet implemented")
-    }
-
-    override suspend fun addLevelProgress(levelProgressEntity: LevelProgressEntity) {
-        TODO("Not yet implemented")
-    }
-
-    override suspend fun getProgress(u_id: Int): List<LevelProgressEntity> {
-        TODO("Not yet implemented")
-    }
-
-}
-
-class FakeQuizRepository {
-    fun test(): ApiRepository {
-        return ApiRepository(FakeQuizApi())
-    }
-}
-
-class FakeQuizApi : QuizApi {
-    override suspend fun getListQuestions(
-        difficulties: String,
-        categories: String
-    ): Response<ListQuestionsResponse> {
-        return Response.success(ListQuestionsResponse())
-    }
-
-    override suspend fun getListOfQuestionCategories(): Response<MetadataResponse> {
-        return TODO("Provide the return value")
-    }
-}
 
 @Preview(showBackground = true)
 @Composable

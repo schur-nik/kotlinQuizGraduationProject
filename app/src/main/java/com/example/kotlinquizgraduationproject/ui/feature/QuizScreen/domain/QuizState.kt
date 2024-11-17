@@ -1,5 +1,6 @@
 package com.example.kotlinquizgraduationproject.ui.feature.QuizScreen.domain
 
+import com.example.kotlinquizgraduationproject.model.quizinfo.LevelInformation
 import com.example.kotlinquizgraduationproject.model.quizinfo.Question
 
 data class QuizState(
@@ -10,5 +11,6 @@ data class QuizState(
     val currentNumber: Int = 0,
     val userAnswer: String? = null,
     val endQuiz: Boolean = false,
-    val correctAnswersCount: Int = 0
+    val correctAnswersCount: Int = 0,
+    val levelInformation: LevelInformation = LevelInformation("", "")
 )

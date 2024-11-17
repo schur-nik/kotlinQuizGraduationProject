@@ -1,10 +1,11 @@
 package com.example.kotlinquizgraduationproject.ui.feature.QuizScreen.domain
 
+import com.example.kotlinquizgraduationproject.model.quizinfo.LevelInformation
 import com.example.kotlinquizgraduationproject.model.quizinfo.Question
 
 sealed class QuizResult {
 
-    data class QuestionListLoaded(val list: List<Question>) : QuizResult()
+    data class QuestionListLoaded(val list: List<Question>, val levelInformation: LevelInformation) : QuizResult()
 
     data object Loading : QuizResult()
 

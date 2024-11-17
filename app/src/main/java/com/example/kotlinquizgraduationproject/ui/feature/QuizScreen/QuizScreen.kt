@@ -32,60 +32,15 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import com.example.kotlinquizgraduationproject.database.dao.UserDao
-import com.example.kotlinquizgraduationproject.database.entity.LevelProgressEntity
-import com.example.kotlinquizgraduationproject.database.entity.UserEntity
 import com.example.kotlinquizgraduationproject.model.quizinfo.LevelInformation
-import com.example.kotlinquizgraduationproject.model.quizinfo.Question
-import com.example.kotlinquizgraduationproject.network.QuizApi
-import com.example.kotlinquizgraduationproject.network.entity.Categories.MetadataResponse
-import com.example.kotlinquizgraduationproject.network.entity.Questions.ListQuestionsResponse
-import com.example.kotlinquizgraduationproject.repository.ApiRepository
 import com.example.kotlinquizgraduationproject.repository.DBRepository
+import com.example.kotlinquizgraduationproject.ui.fakePackage.FakeQuizRepository
+import com.example.kotlinquizgraduationproject.ui.fakePackage.FakeUserDao
 import com.example.kotlinquizgraduationproject.ui.feature.QuizScreen.domain.QuizAction
 import com.example.kotlinquizgraduationproject.ui.feature.QuizScreen.domain.usecases.AnswerQuestionUseCase
 import com.example.kotlinquizgraduationproject.ui.feature.QuizScreen.domain.usecases.FinishQuizUseCase
 import com.example.kotlinquizgraduationproject.ui.feature.QuizScreen.domain.usecases.LoadQuestionsUseCase
 import com.example.kotlinquizgraduationproject.ui.navigation.Routes
-import retrofit2.Response
-
-class FakeQuizRepository {
-    fun test(): ApiRepository {
-        return ApiRepository(FakeQuizApi())
-    }
-}
-
-class FakeQuizApi : QuizApi {
-    override suspend fun getListQuestions(
-        difficulties: String,
-        categories: String
-    ): Response<ListQuestionsResponse> {
-        return Response.success(ListQuestionsResponse())
-    }
-
-    override suspend fun getListOfQuestionCategories(): Response<MetadataResponse> {
-        return TODO("Provide the return value")
-    }
-}
-
-class FakeUserDao : UserDao {
-    override suspend fun addUser(user: UserEntity): Long {
-        TODO("Not yet implemented")
-    }
-
-    override suspend fun getUser(id: Int): UserEntity {
-        TODO("Not yet implemented")
-    }
-
-    override suspend fun addLevelProgress(levelProgressEntity: LevelProgressEntity) {
-        TODO("Not yet implemented")
-    }
-
-    override suspend fun getProgress(u_id: Int): List<LevelProgressEntity> {
-        TODO("Not yet implemented")
-    }
-
-}
 
 @Preview(showBackground = true)
 @Composable

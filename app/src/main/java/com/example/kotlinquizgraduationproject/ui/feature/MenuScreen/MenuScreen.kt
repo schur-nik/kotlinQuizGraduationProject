@@ -1,17 +1,15 @@
 package com.example.kotlinquizgraduationproject.ui.feature.MenuScreen
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
@@ -25,49 +23,23 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
-import androidx.compose.ui.res.fontResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.googlefonts.GoogleFont
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.content.res.ResourcesCompat.getFont
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.kotlinquizgraduationproject.R
-import com.example.kotlinquizgraduationproject.database.dao.UserDao
-import com.example.kotlinquizgraduationproject.database.entity.LevelProgressEntity
-import com.example.kotlinquizgraduationproject.database.entity.UserEntity
 import com.example.kotlinquizgraduationproject.repository.DBRepository
 import com.example.kotlinquizgraduationproject.repository.SharedPreferencesRepository
+import com.example.kotlinquizgraduationproject.ui.fakePackage.FakeUserDao
 import com.example.kotlinquizgraduationproject.ui.feature.MenuScreen.domain.MenuAction
 import com.example.kotlinquizgraduationproject.ui.feature.MenuScreen.domain.usecases.AddUserToDBUseCase
 import com.example.kotlinquizgraduationproject.ui.navigation.Routes
-
-class FakeUserDao : UserDao {
-    override suspend fun addUser(user: UserEntity): Long {
-        TODO("Not yet implemented")
-    }
-
-    override suspend fun getUser(id: Int): UserEntity {
-        TODO("Not yet implemented")
-    }
-
-    override suspend fun addLevelProgress(levelProgressEntity: LevelProgressEntity) {
-        TODO("Not yet implemented")
-    }
-
-    override suspend fun getProgress(u_id: Int): List<LevelProgressEntity> {
-        TODO("Not yet implemented")
-    }
-
-}
 
 @Preview(showBackground = true)
 @Composable
@@ -86,6 +58,7 @@ fun MenuScreen(
 ) {
 
     if (SharedPreferencesRepository.getUserId() == 0) {
+        Log.e("SharedPreferencesRepository", "USER_ID = "+SharedPreferencesRepository.getUserId())
         viewModel.processedAction(MenuAction.AddUserToDB)
     }
 
@@ -131,6 +104,7 @@ fun MenuScreen(
                     MenuButton(stringResource(R.string.menubutton_exit), {}, Modifier.align(Alignment.CenterHorizontally))
                 }
             }
+            Text(text = "USER_ID = "+SharedPreferencesRepository.getUserId().toString(), modifier = Modifier.padding(15.dp))
         }
     )
 
@@ -158,9 +132,9 @@ private fun MenuButton(name: String, onClick: () -> Unit, modifier: Modifier = M
                         colors = listOf(
                             colorResource(R.color.main_blue),
                             Color.Black
-                        ), // Задайте свои цвета
+                        ),
                         startY = 0f,
-                        endY = 260f // Или используйте `endY = 1f` для нормализации
+                        endY = 260f
                     ),
                     shape = RoundedCornerShape(8.dp)
                 )

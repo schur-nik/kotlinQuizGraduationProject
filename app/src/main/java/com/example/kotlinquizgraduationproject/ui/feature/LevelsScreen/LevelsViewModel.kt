@@ -18,10 +18,12 @@ class LevelsViewModel @Inject constructor(
     private val loadLevelProgressUseCase: LoadLevelProgressUseCase
 ) : ViewModel() {
 
+
     val state = MutableStateFlow(LevelsState())
 
     init {
         processedAction(LevelsAction.Init)
+        processedAction(LevelsAction.LoadProgress)
     }
 
     private fun processedAction(action: LevelsAction) {

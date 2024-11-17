@@ -11,6 +11,6 @@ fun User.toUserEntity(): UserEntity {
         name)
 }
 
-fun LevelProgress.toLevelProgressEntity(userId: Int): LevelProgressEntity {
-    return LevelProgressEntity(0, userId, category, difficulty, progress)
+fun LevelProgress.toLevelProgressEntity(progressId: Int, userId: Int): LevelProgressEntity {
+    return LevelProgressEntity(progressId, userId, category, difficulty, progress)
 }

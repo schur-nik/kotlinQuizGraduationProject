@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.kotlinquizgraduationproject.ui.feature.LevelsScreen.domain.LevelsAction
 import com.example.kotlinquizgraduationproject.ui.feature.LevelsScreen.domain.LevelsResult
 import com.example.kotlinquizgraduationproject.ui.feature.LevelsScreen.domain.LevelsState
+import com.example.kotlinquizgraduationproject.ui.feature.LevelsScreen.domain.usecases.LoadLevelProgressUseCase
 import com.example.kotlinquizgraduationproject.ui.feature.LevelsScreen.domain.usecases.LoadQuestionCategoriesUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -13,7 +14,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class LevelsViewModel @Inject constructor(
-    private val loadQuestionCategoriesUseCase: LoadQuestionCategoriesUseCase
+    private val loadQuestionCategoriesUseCase: LoadQuestionCategoriesUseCase,
+    private val loadLevelProgressUseCase: LoadLevelProgressUseCase
 ) : ViewModel() {
 
     val state = MutableStateFlow(LevelsState())
@@ -26,6 +28,7 @@ class LevelsViewModel @Inject constructor(
         viewModelScope.launch {
             when (action) {
                 is LevelsAction.Init -> loadQuestionCategoriesUseCase.loadListOfQuestionCategories()
+                is LevelsAction.LoadProgress -> loadLevelProgressUseCase.loadLevelProgress()
             }.collect { result ->
                 handleResult(result)
             }
@@ -43,7 +46,7 @@ class LevelsViewModel @Inject constructor(
                 state.emit(
                     state.value.copy(
                         isLoading = false,
-                        listCategory = result.list
+                        listCategory = result.listCategory
                     )
                 )
             }
@@ -52,6 +55,14 @@ class LevelsViewModel @Inject constructor(
                 state.emit(
                     state.value.copy(
                         isLoading = false,
+                    )
+                )
+            }
+
+            is LevelsResult.LevelsProgressLoaded -> {
+                state.emit(
+                    state.value.copy(
+                        listProgress = result.listProgress,
                     )
                 )
             }

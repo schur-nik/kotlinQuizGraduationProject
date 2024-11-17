@@ -20,8 +20,12 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Close
@@ -106,6 +110,8 @@ fun LevelsScreen(
     val isPortrait = configuration.orientation == Configuration.ORIENTATION_PORTRAIT
     val state by viewModel.state.collectAsState()
 
+    val listState = rememberLazyListState()
+
 //    var listCategory = listOf(
 //        Category("science"),
 //        Category("sport_and_leisure"),
@@ -118,7 +124,7 @@ fun LevelsScreen(
 //        Category("society_and_culture"),
 //        Category("geography")
 //    )
-//    var listProgress = listOf(LevelProgress("science", "easy", 6))
+//    var listProgress = listOf(LevelProgress("science", "easy", 8))
 //    var listFavorites = listOf(
 //        Category("science"),
 //        Category("sport_and_leisure"),
@@ -131,38 +137,47 @@ fun LevelsScreen(
             Box(
                 modifier = Modifier.fillMaxSize()
             ) {
-                Column(
+                LazyColumn(
+                    state = listState,
                     modifier = Modifier
                         .align(Alignment.TopCenter)
                         .padding(horizontal = if (isPortrait) 20.dp else 50.dp, vertical = 50.dp)
                         .fillMaxSize()
                 ) {
                     state.run {
-                        if (isLoading) {
-                            CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
+                        item {
+                            if (state.isLoading) {
+                                CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+                            }
                         }
                         if (listCategory.isNotEmpty()) {
-                            BlockCategory(
-                                listCategory = listFavorites,
-                                listProgress = listProgress,
-                                translateList = translateCategories(LocalContext.current, listFavorites),
-                                onClick = { difficulty, category ->
-                                    navHostController.navigate(Routes.QuizScreen.createRoute(difficulty, category))
-                                },
-                                favorite = true,
-                                onClickFavorite = {favorite, category -> viewModel.processedAction(LevelsAction.ChangeFavorite(favorite, category))}
-                            )
-                            Spacer(modifier = Modifier.padding(10.dp))
-                            BlockCategory(
-                                listCategory = listCategory - listFavorites.toSet(),
-                                listProgress = listProgress,
-                                translateList = translateCategories(LocalContext.current, listCategory- listFavorites.toSet()),
-                                onClick = { difficulty, category ->
-                                    navHostController.navigate(Routes.QuizScreen.createRoute(difficulty, category))
-                                },
-                                favorite = false,
-                                onClickFavorite = {favorite, category -> viewModel.processedAction(LevelsAction.ChangeFavorite(favorite, category))}
-                            )
+                            item {
+                                BlockCategory(
+                                    listCategory = listFavorites,
+                                    listProgress = listProgress,
+                                    translateList = translateCategories(LocalContext.current, listFavorites),
+                                    onClick = { difficulty, category ->
+                                        navHostController.navigate(Routes.QuizScreen.createRoute(difficulty, category))
+                                    },
+                                    favorite = true,
+                                    onClickFavorite = { favorite, category -> viewModel.processedAction(LevelsAction.ChangeFavorite(favorite, category)) },
+                                    listState = listState
+                                )
+                            }
+                            item { Spacer(modifier = Modifier.padding(10.dp)) }
+                            item {
+                                BlockCategory(
+                                    listCategory = listCategory - listFavorites.toSet(),
+                                    listProgress = listProgress,
+                                    translateList = translateCategories(LocalContext.current, listCategory - listFavorites.toSet()),
+                                    onClick = { difficulty, category ->
+                                        navHostController.navigate(Routes.QuizScreen.createRoute(difficulty, category))
+                                    },
+                                    favorite = false,
+                                    onClickFavorite = { favorite, category -> viewModel.processedAction(LevelsAction.ChangeFavorite(favorite, category)) },
+                                    listState = listState
+                                )
+                            }
                         }
                     }
                 }
@@ -179,14 +194,13 @@ fun BlockCategory(
     onClick: (string1: String, string2: String) -> Unit = { _: String, _: String -> },
     favorite: Boolean,
     onClickFavorite: (string: String, boolean: Boolean) -> Unit = { _: String, _: Boolean -> },
+    listState: LazyListState
 ) {
 //    var showTooltip = true
 //    var tooltipMessage = "Best result:\n 6/10"
     var showTooltip by remember { mutableStateOf(false) }
     var tooltipMessage by remember { mutableStateOf("") }
     var tooltipOffset by remember { mutableStateOf(IntOffset(0, 0)) }
-
-    val listState = rememberLazyListState()
     var expandedStates by remember { mutableStateOf(false) }
 
     LaunchedEffect(listState) {
@@ -221,13 +235,11 @@ fun BlockCategory(
     }
 
     if (expandedStates) {
-        LazyColumn(
-            state = listState,
+        Column(
             modifier = Modifier
                 .fillMaxWidth(),
-            contentPadding = PaddingValues(0.dp)
         ) {
-            items(listCategory.size) { index ->
+            for (index in listCategory.indices) {
                 CategoryItem(
                     category = listCategory[index],
                     translatedName = translateList[index].name,
@@ -342,7 +354,8 @@ fun DifficultyButtons(
                 onImageClick = { offset ->
                     val bestResult = progress.find { it.category == category.name && it.difficulty == difficulty }?.progress ?: 0
                     showTooltip("Best result:\n $bestResult / 10", offset)
-                }
+                },
+                bestProgress = progress.find { it.category == category.name && it.difficulty == difficulty }?.progress ?: 0
             )
         }
     }
@@ -353,7 +366,8 @@ fun DifficultyButton(
     difficulty: String,
     onClick: () -> Unit,
     modifier: Modifier,
-    onImageClick: (IntOffset) -> Unit
+    onImageClick: (IntOffset) -> Unit,
+    bestProgress: Int
 ) {
     var buttonPosition by remember { mutableStateOf(Offset(0f, 0f)) }
 
@@ -383,14 +397,20 @@ fun DifficultyButton(
                     .size(20.dp)
                     .pointerInput(Unit) {
                         detectTapGestures { _ ->
-                            onImageClick(
-                                IntOffset(
+                            onImageClick(IntOffset(
                                     buttonPosition.x.toInt() - 50,
                                     buttonPosition.y.toInt() - 15
-                                )
-                            )
+                                ))
                         }
+                    },
+                colorFilter = ColorFilter.lighting(Color.Black,
+                    when (bestProgress) {
+                        8 -> colorResource(R.color.bronze)
+                        9 -> colorResource(R.color.silver)
+                        10 -> colorResource(R.color.gold)
+                        else -> Color.Black
                     }
+                )
             )
         }
     }

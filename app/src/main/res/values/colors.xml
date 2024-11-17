@@ -9,6 +9,10 @@
     <color name="white">#FFFFFFFF</color>
     <color name="main_blue">#0273CA</color>
 
+    <color name="bronze">#cd7f32</color>
+    <color name="silver">#c0c0c0</color>
+    <color name="gold">#FFD700</color>
+
     <color name="sport_theme">#5466CA02</color>
     <color name="science_theme">#43048AF1</color>
     <color name="food_theme">#65C3AF01</color>

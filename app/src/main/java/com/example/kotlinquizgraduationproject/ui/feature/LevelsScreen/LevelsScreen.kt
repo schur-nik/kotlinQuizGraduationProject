@@ -1,7 +1,6 @@
 package com.example.kotlinquizgraduationproject.ui.feature.LevelsScreen
 
 import android.content.res.Configuration
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -58,15 +57,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.kotlinquizgraduationproject.R
-import com.example.kotlinquizgraduationproject.database.dao.UserDao
-import com.example.kotlinquizgraduationproject.database.entity.LevelProgressEntity
-import com.example.kotlinquizgraduationproject.database.entity.UserEntity
 import com.example.kotlinquizgraduationproject.model.quizinfo.Category
 import com.example.kotlinquizgraduationproject.model.usersinfo.LevelProgress
-import com.example.kotlinquizgraduationproject.network.QuizApi
-import com.example.kotlinquizgraduationproject.network.entity.Categories.MetadataResponse
-import com.example.kotlinquizgraduationproject.network.entity.Questions.ListQuestionsResponse
-import com.example.kotlinquizgraduationproject.repository.ApiRepository
 import com.example.kotlinquizgraduationproject.repository.DBRepository
 import com.example.kotlinquizgraduationproject.ui.fakePackage.FakeQuizRepository
 import com.example.kotlinquizgraduationproject.ui.fakePackage.FakeUserDao
@@ -74,7 +66,6 @@ import com.example.kotlinquizgraduationproject.ui.feature.LevelsScreen.domain.us
 import com.example.kotlinquizgraduationproject.ui.feature.LevelsScreen.domain.usecases.LoadQuestionCategoriesUseCase
 import com.example.kotlinquizgraduationproject.ui.navigation.Routes
 import com.example.kotlinquizgraduationproject.utils.translateCategories
-import retrofit2.Response
 
 @Preview(showBackground = true)
 @Composable
@@ -122,33 +113,20 @@ fun LevelsScreen(
                 Column(
                     modifier = Modifier
                         .align(Alignment.TopCenter)
-                        .padding(
-                            horizontal = if (isPortrait) {
-                                20.dp
-                            } else {
-                                50.dp
-                            }, vertical = 50.dp
-                        )
+                        .padding(horizontal = if (isPortrait) 20.dp else 50.dp, vertical = 50.dp)
                         .fillMaxSize()
                 ) {
                     state.run {
-                        if (state.isLoading) {
-                            CircularProgressIndicator(
-                                modifier = Modifier.align(Alignment.CenterHorizontally)
-                            )
+                        if (isLoading) {
+                            CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
                         }
                         if (listCategory.isNotEmpty()) {
                             BlockCategory(
                                 listCategory = listCategory,
                                 listProgress = listProgress,
-                                translateList = translateCategories(
-                                    LocalContext.current,
-                                    listCategory
-                                ),
+                                translateList = translateCategories(LocalContext.current, listCategory),
                                 onClick = { difficulty, category ->
-                                    navHostController.navigate(
-                                        Routes.QuizScreen.createRoute(difficulty, category)
-                                    )
+                                    navHostController.navigate(Routes.QuizScreen.createRoute(difficulty, category))
                                 }
                             )
                         }
@@ -184,112 +162,99 @@ fun BlockCategory(
     }
 
     if (showTooltip) {
-        Popup(
-            alignment = Alignment.TopStart,
-            offset = tooltipOffset
-        ) {
-            Box(
-                modifier = Modifier
-                    .background(Color.White, RoundedCornerShape(8.dp))
-                    .border(1.dp, Color.Gray, RoundedCornerShape(8.dp))
-                    .padding(0.dp)
-            ) {
-                IconButton(onClick = { showTooltip = false },
-                    modifier = Modifier
-                        .size(15.dp)
-                        .align(Alignment.TopEnd)
-                        .padding(top = 0.dp, end = 0.dp))
-                {
-                    Icon(imageVector = Icons.Default.Close, contentDescription = "Close")
-                }
-                Text(text = tooltipMessage, textAlign = TextAlign.Center, modifier = Modifier.padding(horizontal = 13.dp, vertical = 8.dp))
-            }
-        }
+        Tooltip(tooltipMessage, tooltipOffset) { showTooltip = false }
     }
 
     LazyColumn(
         state = listState,
         modifier = Modifier
             .fillMaxWidth(),
-        contentPadding = PaddingValues(
-            horizontal = 0.dp,
-            vertical = 0.dp
-        )
+        contentPadding = PaddingValues(0.dp)
     ) {
-        items(listCategory.size) { element ->
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 5.dp)
-                    .background(getCategoryColor(listCategory[element]))
-            ) {
-                Image(
-                    painter = painterResource(id = getCategoryImage(listCategory[element])),
-                    contentDescription = null,
-                    modifier = Modifier
-                        .size(80.dp)
-                        .align(Alignment.CenterEnd)
-                        .padding(bottom = 50.dp)
-                )
-                Row(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(10.dp)
-                ) {
-                    Column(
-                        modifier = Modifier
-                            .weight(1f)
-                    ) {
-                        Text(
-                            translateList[element].name,
-                            fontSize = 24.sp,
-                            fontWeight = FontWeight.Bold,
-                            modifier = Modifier.padding(start = 5.dp, bottom = 5.dp)
-                        )
-                        Row(
-                            modifier = Modifier
-                                .fillMaxSize()
-                        ) {
-                            DifficultyButton(
-                                stringResource(R.string.levelscreen_easy),
-                                { onClick("easy", listCategory[element].name) },
-                                Modifier
-                                    .padding(1.dp)
-                                    .weight(1f),
-                                { offset ->
-                                    tooltipMessage = "Best result:\n ${listProgress.find { it.category == listCategory[element].name && it.difficulty == "easy" }?.progress ?: 0} / 10"
-                                    tooltipOffset = offset
-                                    showTooltip = true
-                                }
-                            )
-                            DifficultyButton(
-                                stringResource(R.string.levelscreen_medium),
-                                { onClick("medium", listCategory[element].name) },
-                                Modifier
-                                    .padding(1.dp)
-                                    .weight(1f),
-                                { offset ->
-                                    tooltipMessage =  "Best result:\n ${listProgress.find { it.category == listCategory[element].name && it.difficulty == "medium" }?.progress ?: 0} / 10"
-                                    tooltipOffset = offset
-                                    showTooltip = true
-                                }
-                            )
-                            DifficultyButton(
-                                stringResource(R.string.levelscreen_hard),
-                                { onClick("hard", listCategory[element].name) },
-                                Modifier
-                                    .padding(1.dp)
-                                    .weight(1f),
-                                { offset ->
-                                    tooltipMessage =  "Best result:\n ${listProgress.find { it.category == listCategory[element].name && it.difficulty == "hard" }?.progress ?: 0} / 10"
-                                    tooltipOffset = offset
-                                    showTooltip = true
-                                }
-                            )
-                        }
-                    }
+        items(listCategory.size) { index ->
+            CategoryItem(
+                category = listCategory[index],
+                translatedName = translateList[index].name,
+                progress = listProgress,
+                onClick = onClick,
+                showTooltip = { message, offset ->
+                    tooltipMessage = message
+                    tooltipOffset = offset
+                    showTooltip = true
                 }
+            )
+        }
+    }
+}
+
+@Composable
+fun Tooltip(message: String, offset: IntOffset, onClose: () -> Unit) {
+    Popup(alignment = Alignment.TopStart, offset = offset) {
+        Box(
+            modifier = Modifier
+                .background(Color.White, RoundedCornerShape(8.dp))
+                .border(1.dp, Color.Gray, RoundedCornerShape(8.dp))
+                .padding(0.dp)
+        ) {
+            IconButton(onClick = onClose, modifier = Modifier.size(15.dp).align(Alignment.TopEnd).padding(0.dp)) {
+                Icon(imageVector = Icons.Default.Close, contentDescription = "Close")
             }
+            Text(text = message, textAlign = TextAlign.Center, modifier = Modifier.padding(horizontal = 13.dp, vertical = 8.dp))
+        }
+    }
+}
+
+@Composable
+fun CategoryItem(
+    category: Category,
+    translatedName: String,
+    progress: List<LevelProgress>,
+    onClick: (String, String) -> Unit,
+    showTooltip: (String, IntOffset) -> Unit
+) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 5.dp)
+            .background(getCategoryColor(category))
+    ) {
+        Image(
+            painter = painterResource(id = getCategoryImage(category)),
+            contentDescription = null,
+            modifier = Modifier.size(80.dp).align(Alignment.CenterEnd).padding(bottom = 50.dp)
+        )
+        Row(modifier = Modifier.fillMaxSize().padding(10.dp)) {
+            Column(modifier = Modifier.weight(1f)) {
+                Text(translatedName, fontSize = 24.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(start = 5.dp, bottom = 5.dp))
+                DifficultyButtons(category, progress, onClick, showTooltip)
+            }
+        }
+    }
+}
+
+@Composable
+fun DifficultyButtons(
+    category: Category,
+    progress: List<LevelProgress>,
+    onClick: (String, String) -> Unit,
+    showTooltip: (String, IntOffset) -> Unit
+) {
+    Row(modifier = Modifier.fillMaxSize()) {
+        listOf("easy", "medium", "hard").forEach { difficulty ->
+            DifficultyButton(
+                difficulty = stringResource(id = when (difficulty) {
+                    "easy" -> R.string.levelscreen_easy
+                    "medium" -> R.string.levelscreen_medium
+                    "hard" -> R.string.levelscreen_hard
+                    else -> R.string.levelscreen_easy
+                }),
+                onClick = { onClick(difficulty, category.name) },
+                modifier = Modifier.weight(1f).padding(1.dp),
+                onImageClick = { offset ->
+                    val bestResult = progress.find { it.category == category.name && it.difficulty == difficulty }?.progress ?: 0
+                    showTooltip("Best result:\n $bestResult / 10", offset)
+                }
+            )
         }
     }
 }
@@ -330,10 +295,7 @@ fun DifficultyButton(
                     .pointerInput(Unit) {
                         detectTapGestures { _ ->
                             onImageClick(
-                                IntOffset(
-                                    buttonPosition.x.toInt() - 50,
-                                    buttonPosition.y.toInt() - 15
-                                )
+                                IntOffset(buttonPosition.x.toInt() - 50, buttonPosition.y.toInt() - 15)
                             )
                         }
                     }

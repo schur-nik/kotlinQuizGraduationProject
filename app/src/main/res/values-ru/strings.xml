@@ -20,4 +20,8 @@
     <string name="menubutton_settings">Настройка</string>
     <string name="menubutton_exit">Выход</string>
 
+    <string name="levelscreen_easy">Легкий</string>
+    <string name="levelscreen_medium">Средний</string>
+    <string name="levelscreen_hard">Тяжелый</string>
+
 </resources>

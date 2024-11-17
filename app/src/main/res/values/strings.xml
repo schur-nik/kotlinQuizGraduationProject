@@ -18,5 +18,8 @@
     <string name="menubutton_profile">Profile</string>
     <string name="menubutton_settings">Settings</string>
     <string name="menubutton_exit">Exit</string>
+    <string name="levelscreen_easy">Easy</string>
+    <string name="levelscreen_medium">Medium</string>
+    <string name="levelscreen_hard">Hard</string>
 
 </resources>

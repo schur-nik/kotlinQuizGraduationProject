@@ -45,6 +45,7 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -230,9 +231,9 @@ fun BlockCategory(
             ) {
                 IconButton(onClick = { showTooltip = false },
                     modifier = Modifier
-                    .size(15.dp)
-                    .align(Alignment.TopEnd)
-                    .padding(top = 0.dp, end = 0.dp))
+                        .size(15.dp)
+                        .align(Alignment.TopEnd)
+                        .padding(top = 0.dp, end = 0.dp))
                 {
                     Icon(imageVector = Icons.Default.Close, contentDescription = "Close")
                 }
@@ -285,7 +286,7 @@ fun BlockCategory(
                                 .fillMaxSize()
                         ) {
                             DifficultyButton(
-                                "Easy",
+                                stringResource(R.string.levelscreen_easy),
                                 { onClick("easy", listCategory[element].name) },
                                 Modifier
                                     .padding(1.dp)
@@ -297,24 +298,25 @@ fun BlockCategory(
                                 }
                             )
                             DifficultyButton(
-                                "Medium",
+                                stringResource(R.string.levelscreen_medium),
                                 { onClick("medium", listCategory[element].name) },
                                 Modifier
                                     .padding(1.dp)
                                     .weight(1f),
                                 { offset ->
-                                    tooltipMessage = "Progress: ${listProgress.find { it.category == listCategory[element].name && it.difficulty == "medium" }?.progress ?: 0} levels completed"
+                                    tooltipMessage =  "Best result:\n ${listProgress.find { it.category == listCategory[element].name && it.difficulty == "medium" }?.progress ?: 0} / 10"
                                     tooltipOffset = offset
                                     showTooltip = true
                                 }
                             )
-                            DifficultyButton("Hard",
+                            DifficultyButton(
+                                stringResource(R.string.levelscreen_hard),
                                 { onClick("hard", listCategory[element].name) },
                                 Modifier
                                     .padding(1.dp)
                                     .weight(1f),
                                 { offset ->
-                                    tooltipMessage = "Progress: ${listProgress.find { it.category == listCategory[element].name && it.difficulty == "hard" }?.progress ?: 0} levels completed"
+                                    tooltipMessage =  "Best result:\n ${listProgress.find { it.category == listCategory[element].name && it.difficulty == "hard" }?.progress ?: 0} / 10"
                                     tooltipOffset = offset
                                     showTooltip = true
                                 }
@@ -362,7 +364,12 @@ fun DifficultyButton(
                     .size(20.dp)
                     .pointerInput(Unit) {
                         detectTapGestures { _ ->
-                            onImageClick(IntOffset(buttonPosition.x.toInt()-50, buttonPosition.y.toInt()-15))
+                            onImageClick(
+                                IntOffset(
+                                    buttonPosition.x.toInt() - 50,
+                                    buttonPosition.y.toInt() - 15
+                                )
+                            )
                         }
                     }
             )

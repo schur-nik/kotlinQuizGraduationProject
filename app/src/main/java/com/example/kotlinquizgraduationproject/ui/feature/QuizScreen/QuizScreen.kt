@@ -11,11 +11,17 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -24,30 +30,41 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.example.kotlinquizgraduationproject.R
+import com.example.kotlinquizgraduationproject.model.quizinfo.Category
 import com.example.kotlinquizgraduationproject.model.quizinfo.LevelInformation
+import com.example.kotlinquizgraduationproject.model.quizinfo.Question
 import com.example.kotlinquizgraduationproject.repository.DBRepository
 import com.example.kotlinquizgraduationproject.ui.fakePackage.FakeQuizRepository
 import com.example.kotlinquizgraduationproject.ui.fakePackage.FakeUserDao
 import com.example.kotlinquizgraduationproject.ui.feature.QuizScreen.domain.QuizAction
+import com.example.kotlinquizgraduationproject.ui.feature.QuizScreen.domain.QuizState
 import com.example.kotlinquizgraduationproject.ui.feature.QuizScreen.domain.usecases.AnswerQuestionUseCase
 import com.example.kotlinquizgraduationproject.ui.feature.QuizScreen.domain.usecases.FinishQuizUseCase
 import com.example.kotlinquizgraduationproject.ui.feature.QuizScreen.domain.usecases.LoadQuestionsUseCase
 import com.example.kotlinquizgraduationproject.ui.navigation.Routes
+import com.example.kotlinquizgraduationproject.utils.getCategoryColor
+import com.example.kotlinquizgraduationproject.utils.translateCategories
 
 @Preview(showBackground = true)
 @Composable
 fun QuizScreenPreview() {
     val navController = rememberNavController()
     QuizScreen(
-        LevelInformation("easy", "science"),
+        LevelInformation("easy", "sport_and_leisure"),
         navHostController = navController,
         viewModel = QuizViewModel(
             LoadQuestionsUseCase(FakeQuizRepository().test()),
@@ -76,185 +93,297 @@ fun QuizScreen(
                     .padding(paddingValues)
                     .fillMaxSize()
             ) {
-//                Text(text = "category=" + levelInformation.category)
-//                Text(text = "category=" + levelInformation.difficulty)
                 state.run {
-//                    val currentQuestion =
+//                    var currentQuestion: Question? =
 //                        Question(
 //                            "1",
 //                            listOf(
 //                                "ANSWER1",
 //                                "ANSWER2",
 //                                "ANSWER3",
-//                                "ANSWER4ANSWERvANSWERANSWERANSWER"
+//                                "123456789123456789123456789123456789"
 //                            ),
-//                            "Questiuon is hereQuestiuon is hereQuestiuon is hereQuestiuon is hereQuestiuon is hereQuestiuon is hereQuestiuon is hereQuestiuon is hereQuestiuon is hereQuestiuon is hereQuestiuon is hereQuestiuon is here"
+//                            "Questiuon is hereQuestiuon is hereQuestiuon is hereQuestiuon is hereQuestiuon is hereQuestiuon is hereQuestiuon is hereQuestiuon is hereQuestiuon is hereQuestiuon is hereQuestiuon is hereQuestiuon is hereQuestiuon is hereQuestiuon is hereQuestiuon is here"
 //                        )
-////                    val userAnswer = "1"
-//                    val questionCount = 1
-                    Text(text = "currentNumber=" + state.currentNumber.inc())
-                    Text(text = "questionCount=" + state.questionCount)
-                    Text(text = "correctAnswersCount=" + state.correctAnswersCount)
-//                    Text(text = "size=" + state.questionList.size)
-//                    Text(text = "userAnswer=" + state.userAnswer)
-//                    Text(text = "correctAnswer=" + state.currentQuestion?.correctAnswer)
-//                    Text(text = "endQuiz=" + state.endQuiz)
+//                    val questionCount = 0
+//                    val endQuiz = true
+//                    currentQuestion = null
+
                     if (isLoading) {
-                        CircularProgressIndicator(
-                            modifier = Modifier
-                                .align(Alignment.CenterHorizontally)
-                                .fillMaxSize()
-                        )
-                    }
-
-                    if (currentQuestion != null) {
-                        Column(
-                            modifier = Modifier
-                                .align(Alignment.CenterHorizontally)
-                                .padding(top = 100.dp)
-                                .padding(15.dp)
-                        )
-                        {
-                            Text(
-                                text = currentQuestion.question,
-                                fontSize = 20.sp,
-                                minLines = 6,
-                                maxLines = 6
+                        CircularProgressIndicator(modifier = Modifier.fillMaxSize())
+                    } else {
+                        currentQuestion?.let { currentQuestion ->
+                            QuizContent(
+                                levelInformation = levelInformation,
+                                currentQuestion = currentQuestion,
+                                state = state,
+                                finishClick = { viewModel.processedAction(QuizAction.FinishQuiz) },
+                                nextClick = { viewModel.processedAction(QuizAction.NextQuestion) },
+                                answerClick = { indexAnswer ->
+                                    if (userAnswer == null) viewModel.processedAction(
+                                        QuizAction.AnswerQuestion(currentQuestion.allAnswers[indexAnswer])
+                                    )
+                                }
                             )
-                            LazyVerticalGrid(
-                                modifier = Modifier.padding(top = 24.dp),
-                                columns = GridCells.Fixed(2)
-                            ) {
-                                currentQuestion.allAnswers.size.let {
-                                    items(it) { answer ->
-                                        QuestionBox(
-                                            answer = currentQuestion.allAnswers[answer],
-                                            correctAnswer = currentQuestion.correctAnswer,
-                                            userAnswer = userAnswer,
-                                            onClick = {
-                                                if (userAnswer == null) {
-                                                    viewModel.processedAction(
-                                                        QuizAction.AnswerQuestion(
-                                                            currentQuestion.allAnswers[answer]
-                                                        )
-                                                    )
-                                                }
-                                            }
-                                        )
-                                    }
-                                }
-                            }
-                            Row (modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween,
-                                verticalAlignment = Alignment.CenterVertically){
-                                Spacer(modifier = Modifier.weight(1f))
-                                Text(
-                                    text = "Answer: $correctAnswersCount/$questionCount",
-                                    modifier = Modifier.wrapContentWidth(Alignment.CenterHorizontally).padding(end = 5.dp)
-                                )
-                                Button(
-                                    onClick = {
-                                        if (currentNumber + 1 >= questionCount) {
-                                            viewModel.processedAction(QuizAction.FinishQuiz)
-                                        } else {
-                                            viewModel.processedAction(QuizAction.NextQuestion)
-                                        }
-                                    }
+                        } ?: run {
+                            if (questionCount == 0 && !endQuiz) {
+                                Column(
+                                    modifier = Modifier
+                                        .align(Alignment.CenterHorizontally)
+                                        .padding(top = 360.dp),
+                                    verticalArrangement = Arrangement.Center,
+                                    horizontalAlignment = Alignment.CenterHorizontally
                                 ) {
-                                    Text(text = if (currentNumber + 1 >= questionCount) "END" else "NEXT")
+                                    Text(text = "NO_DATA_FOUND")
+                                    Spacer(modifier = Modifier.padding(10.dp))
+                                    Button(onClick = { navHostController.navigate(Routes.LevelsScreen.route) }) {
+                                        Text(text = "BACK TO MENU")
+                                    }
                                 }
+                            } else if (endQuiz) {
+                                EndQuizScreen(navHostController, levelInformation, state)
                             }
                         }
                     }
-
-                    if (endQuiz) {
-                        Column(
-                            modifier = Modifier
-                                .align(Alignment.CenterHorizontally)
-                                .padding(top = 160.dp),
-                            verticalArrangement = Arrangement.Center,
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ) {
-                            Text(text = "QUIZ IS END")
-                            Spacer(modifier = Modifier.height(16.dp))
-                            Button(onClick = { navHostController.navigate(Routes.LevelsScreen.route) }) {
-                                Text(text = "TO MENU")
-                            }
-                        }
-                    }
-
-                    if (!isLoading && questionCount == 0 && !endQuiz) {
-                        Text(text = "NO_DATA_FOUND")
-                    }
-
                 }
             }
         }
     )
-
 }
 
 @Composable
-fun QuestionBox(answer: String, correctAnswer: String?, userAnswer: String?, onClick: () -> Unit) {
-    val modifier = when {
-        userAnswer == null -> {
-            Modifier
-                .fillMaxWidth()
-                .height(100.dp)
-                .padding(8.dp)
-                .background(Color.Blue)
-                .clickable {
-                    onClick()
-                }
-        }
-
-        answer == userAnswer -> {
-            Modifier
-                .fillMaxWidth()
-                .height(100.dp)
-                .padding(8.dp)
-                .background(
-                    if (userAnswer == correctAnswer) {
-                        Color.Green
-                    } else {
-                        Color.Red
-                    }
+fun EndQuizScreen(
+    navHostController: NavHostController,
+    levelInformation: LevelInformation,
+    state: QuizState
+) {
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        Box(
+            modifier = Modifier
+                .width(300.dp)
+                .height(220.dp)
+                .background(Color(0xFFADD8E6))
+                .padding(16.dp)
+        ) {
+            Column(
+                verticalArrangement = Arrangement.Top,
+                horizontalAlignment = Alignment.Start,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(
+                    text = stringResource(R.string.quizscreen_results),
+                    fontSize = 30.sp,
+                    modifier = Modifier
+                        .align(Alignment.CenterHorizontally)
+                        .padding(bottom = 16.dp)
                 )
-                .clickable {
-                    onClick()
-                }
-        }
-
-        else -> {
-            Modifier
-                .fillMaxWidth()
-                .height(100.dp)
-                .padding(8.dp)
-                .background(
-                    if (answer == correctAnswer) {
-                        Color.Green
-                    } else {
-                        Color.Red
-                    }
+                Text(
+                    text = stringResource(
+                        R.string.quizscreen_theme, translateCategories(
+                            LocalContext.current,
+                            listOf(Category(levelInformation.category))
+                        ).first().name
+                    ),
+                    modifier = Modifier.padding(bottom = 4.dp)
                 )
+                Text(
+                    text = stringResource(
+                        R.string.quizscreen_difficulty,
+                        levelInformation.difficulty
+                    ),
+                    modifier = Modifier.padding(bottom = 4.dp)
+                )
+                Text(
+                    text = stringResource(
+                        R.string.quizscreen_correct_answers,
+                        state.correctAnswersCount
+                    ),
+                    modifier = Modifier.padding(bottom = 4.dp)
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+                Button(
+                    onClick = { navHostController.navigate(Routes.LevelsScreen.route) },
+                    modifier = Modifier
+                        .align(Alignment.CenterHorizontally)
+                        .background(
+                            brush = Brush.verticalGradient(
+                                colors = listOf(
+                                    colorResource(R.color.main_blue),
+                                    Color.Black
+                                ),
+                                startY = 0f,
+                                endY = 260f
+                            ),
+                            shape = RoundedCornerShape(8.dp)
+                        ),
+                    colors = ButtonDefaults.buttonColors(
+                        Color.Transparent,
+                        Color.White
+                    ),
+                )
+                {
+                    Text(text = stringResource(R.string.quizscreen_finish))
+                }
+            }
         }
     }
-    AnswerBox(
-        answer, modifier = modifier
-    )
 }
 
 @Composable
-fun AnswerBox(title: String, modifier: Modifier = Modifier) {
-    Box(
-        modifier = modifier
+fun QuizContent(
+    levelInformation: LevelInformation,
+    currentQuestion: Question,
+    state: QuizState,
+    finishClick: () -> Unit,
+    nextClick: () -> Unit,
+    answerClick: (index: Int) -> Unit = { _: Int -> },
+) {
+    Column(modifier = Modifier.padding(top = 100.dp, start = 15.dp, end = 15.dp)) {
+        Text(
+            text = stringResource(
+                R.string.quizscreen_theme, translateCategories(
+                    LocalContext.current,
+                    listOf(Category(levelInformation.category))
+                ).first().name
+            ),
+            modifier = Modifier.padding(horizontal = 5.dp)
+        )
+        Text(
+            text = stringResource(R.string.quizscreen_question, state.currentNumber.inc()),
+            fontSize = 30.sp,
+            modifier = Modifier
+                .padding(horizontal = 5.dp)
+                .padding(bottom = 5.dp)
+        )
+        QuestionBox(levelInformation, currentQuestion, state.userAnswer, answerClick)
+        ProgressAndNavigation(state, finishClick, nextClick)
+    }
+}
 
+@Composable
+fun ProgressAndNavigation(state: QuizState, finishClick: () -> Unit, nextClick: () -> Unit) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.End,
+        verticalAlignment = Alignment.CenterVertically
     ) {
+        Text(
+            text = "Answer: ${state.correctAnswersCount}/${state.questionCount}",
+            modifier = Modifier.padding(end = 5.dp)
+        )
+        Button(
+            onClick = {
+                if (state.currentNumber + 1 >= state.questionCount) {
+                    finishClick()
+                } else {
+                    nextClick()
+                }
+            },
+            modifier = Modifier
+                .background(
+                    brush = Brush.verticalGradient(
+                        colors = listOf(colorResource(R.color.main_blue), Color.Black),
+                        startY = 0f,
+                        endY = 260f
+                    ),
+                    shape = RoundedCornerShape(8.dp)
+                )
+                .height(40.dp)
+        ) {
+            Text(text = if (state.currentNumber + 1 >= state.questionCount) "END" else "NEXT")
+        }
+    }
+}
+
+@Composable
+fun QuestionBox(
+    levelInformation: LevelInformation,
+    currentQuestion: Question,
+    userAnswer: String?,
+    answerClick: (Int) -> Unit
+) {
+    LazyColumn {
+        item {
+            Box(
+                modifier = Modifier
+                    .background(
+                        getCategoryColor(Category(levelInformation.category)),
+                        shape = RoundedCornerShape(8.dp)
+                    )
+                    .padding(10.dp)
+                    .height(140.dp)
+                    .verticalScroll(rememberScrollState())
+            ) {
+                Text(
+                    text = currentQuestion.question,
+                    fontSize = 20.sp,
+                    modifier = Modifier.fillMaxSize()
+                )
+            }
+        }
+    }
+    LazyVerticalGrid(
+        modifier = Modifier.padding(top = 24.dp),
+        columns = GridCells.Fixed(2)
+    ) {
+        items(currentQuestion.allAnswers.size) { index ->
+            AnswerBox(
+                answer = currentQuestion.allAnswers[index],
+                correctAnswer = currentQuestion.correctAnswer,
+                userAnswer = userAnswer,
+                onClick = { answerClick(index) }
+            )
+        }
+    }
+}
+
+@Composable
+fun AnswerBox(answer: String, correctAnswer: String?, userAnswer: String?, onClick: () -> Unit) {
+    val baseModifier = Modifier
+        .fillMaxWidth()
+        .height(100.dp)
+        .padding(8.dp)
+        .background(Color.Black, shape = RoundedCornerShape(8.dp))
+
+    val gradientColors = listOf(
+        when {
+            userAnswer == null -> colorResource(R.color.main_blue)
+            answer == userAnswer -> if (userAnswer == correctAnswer) Color.Green else Color.Red
+            else -> if (answer == correctAnswer) Color.Green else Color.Red
+        },
+        Color.Black
+    )
+
+    val modifier = baseModifier
+        .background(brush = Brush.verticalGradient(colors = gradientColors))
+        .clickable { onClick() }
+
+    AnswerText(answer, modifier)
+}
+
+@Composable
+fun AnswerText(title: String, modifier: Modifier = Modifier) {
+    Box(modifier = modifier) {
         Text(
             text = title,
             textAlign = TextAlign.Center,
-            fontSize = 20.sp,
-            modifier = Modifier.align(Alignment.Center)
+            fontSize = DynamicText(title),
+            modifier = Modifier
+                .align(Alignment.Center)
+                .padding(horizontal = 3.dp),
+            color = Color.LightGray
         )
+    }
+}
+
+@Composable
+fun DynamicText(text: String): TextUnit {
+    return when (text.length) {
+        in 0..24 -> 20.sp
+        in 24..35 -> 18.sp
+        else -> 16.sp
     }
 }

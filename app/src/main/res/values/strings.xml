@@ -21,5 +21,13 @@
     <string name="levelscreen_easy">Easy</string>
     <string name="levelscreen_medium">Medium</string>
     <string name="levelscreen_hard">Hard</string>
+    <string name="levelscreen_favorite_topics">Favorite topics:</string>
+    <string name="levelscreen_unfavorite_topics">Unfavorite topics:</string>
+    <string name="quizscreen_results">Results:</string>
+    <string name="quizscreen_theme">Theme: %1$s</string>
+    <string name="quizscreen_difficulty">Difficulty: %1$s</string>
+    <string name="quizscreen_correct_answers">Correct Answers: %1$s/10</string>
+    <string name="quizscreen_finish">FINISH</string>
+    <string name="quizscreen_question">Question %1$s</string>
 
 </resources>

@@ -21,18 +21,15 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ButtonElevation
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -42,7 +39,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -50,6 +46,7 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.input.pointer.pointerInput
@@ -81,8 +78,9 @@ import com.example.kotlinquizgraduationproject.ui.feature.LevelsScreen.domain.us
 import com.example.kotlinquizgraduationproject.ui.feature.LevelsScreen.domain.usecases.LoadFavoriteCategoriesUseCase
 import com.example.kotlinquizgraduationproject.ui.feature.LevelsScreen.domain.usecases.LoadLevelProgressUseCase
 import com.example.kotlinquizgraduationproject.ui.feature.LevelsScreen.domain.usecases.LoadQuestionCategoriesUseCase
-import com.example.kotlinquizgraduationproject.ui.feature.QuizScreen.domain.QuizAction
 import com.example.kotlinquizgraduationproject.ui.navigation.Routes
+import com.example.kotlinquizgraduationproject.utils.getCategoryColor
+import com.example.kotlinquizgraduationproject.utils.getCategoryImage
 import com.example.kotlinquizgraduationproject.utils.translateCategories
 
 @Preview(showBackground = true)
@@ -222,7 +220,7 @@ fun BlockCategory(
                 .border(1.dp, Color.Black)
                 .padding(start = 3.dp)
                 .clickable { expandedStates = !expandedStates }) {
-                Text(text = "Unfavorite topics:", fontSize = 15.sp, modifier = Modifier
+                Text(text = stringResource(R.string.levelscreen_unfavorite_topics), fontSize = 15.sp, modifier = Modifier
                     .fillMaxWidth()
                     .weight(1f))
                 Icon(imageVector = if (expandedStates) Icons.Filled.KeyboardArrowUp else Icons.Filled.KeyboardArrowDown, contentDescription = null)
@@ -231,7 +229,7 @@ fun BlockCategory(
     }
     else {
         expandedStates = true
-        Text(text = "Favorite topics:", fontSize = 15.sp)
+        Text(text = stringResource(R.string.levelscreen_favorite_topics), fontSize = 15.sp)
     }
 
     if (expandedStates) {
@@ -338,7 +336,7 @@ fun DifficultyButtons(
     onClick: (String, String) -> Unit,
     showTooltip: (String, IntOffset) -> Unit
 ) {
-    Row(modifier = Modifier.fillMaxSize()) {
+    Row(modifier = Modifier.fillMaxWidth()) {
         listOf("easy", "medium", "hard").forEach { difficulty ->
             DifficultyButton(
                 difficulty = stringResource(id = when (difficulty) {
@@ -350,7 +348,7 @@ fun DifficultyButtons(
                 onClick = { onClick(difficulty, category.name) },
                 modifier = Modifier
                     .weight(1f)
-                    .padding(1.dp),
+                    .padding(start = 6.dp),
                 onImageClick = { offset ->
                     val bestResult = progress.find { it.category == category.name && it.difficulty == difficulty }?.progress ?: 0
                     showTooltip("Best result:\n $bestResult / 10", offset)
@@ -376,76 +374,62 @@ fun DifficultyButton(
         modifier = modifier
             .onGloballyPositioned { layoutCoordinates ->
                 buttonPosition = layoutCoordinates.positionOnScreen()
-            },
+            }
+            .background(
+                brush = Brush.verticalGradient(
+                    colors = listOf(
+                        colorResource(R.color.main_blue),
+                        Color.Black
+                    ),
+                    startY = 0f,
+                    endY = 260f
+                ),
+                shape = RoundedCornerShape(8.dp)
+            )
+        ,
         contentPadding = PaddingValues(0.dp),
         colors = ButtonDefaults.buttonColors(
-            colorResource(R.color.main_blue),
+            Color.Transparent,
             Color.White
         ),
         shape = RoundedCornerShape(8.dp)
     ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Center
+        Box(modifier = Modifier
+            .fillMaxWidth()
         ) {
-            Text(text = difficulty)
-            Image(
-                painter = painterResource(id = R.drawable.medal_default),
-                contentDescription = null,
-                modifier = Modifier
-                    .size(20.dp)
-                    .pointerInput(Unit) {
-                        detectTapGestures { _ ->
-                            onImageClick(IntOffset(
-                                    buttonPosition.x.toInt() - 50,
-                                    buttonPosition.y.toInt() - 15
-                                ))
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center
+            ) {
+                Text(text = difficulty)
+                Image(
+                    painter = painterResource(id = R.drawable.medal_default),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .size(20.dp)
+                        .pointerInput(Unit) {
+                            detectTapGestures { _ ->
+                                onImageClick(
+                                    IntOffset(
+                                        buttonPosition.x.toInt() - 50,
+                                        buttonPosition.y.toInt() - 15
+                                    )
+                                )
+                            }
+                        },
+                    colorFilter = ColorFilter.lighting(
+                        Color.Black,
+                        when (bestProgress) {
+                            8 -> colorResource(R.color.bronze)
+                            9 -> colorResource(R.color.silver)
+                            10 -> colorResource(R.color.gold)
+                            else -> Color.Black
                         }
-                    },
-                colorFilter = ColorFilter.lighting(Color.Black,
-                    when (bestProgress) {
-                        8 -> colorResource(R.color.bronze)
-                        9 -> colorResource(R.color.silver)
-                        10 -> colorResource(R.color.gold)
-                        else -> Color.Black
-                    }
+                    )
                 )
-            )
+            }
         }
-    }
-}
-
-@Composable
-fun getCategoryColor(category: Category): Color {
-    return when (category.name) {
-        "science" -> colorResource(R.color.science_theme)
-        "sport_and_leisure" -> colorResource(R.color.sport_theme)
-        "food_and_drink" -> colorResource(R.color.food_theme)
-        "music" -> colorResource(R.color.music_theme)
-        "general_knowledge" -> colorResource(R.color.general_theme)
-        "history" -> colorResource(R.color.history_theme)
-        "arts_and_literature" -> colorResource(R.color.literature_theme)
-        "film_and_tv" -> colorResource(R.color.film_theme)
-        "society_and_culture" -> colorResource(R.color.society_theme)
-        "geography" -> colorResource(R.color.geography_theme)
-        else -> Color.LightGray
-    }
-}
-
-fun getCategoryImage(category: Category): Int {
-    return when (category.name) {
-        "science" -> R.drawable.science
-        "sport_and_leisure" -> R.drawable.sport
-        "food_and_drink" -> R.drawable.burger
-        "music" -> R.drawable.music
-        "general_knowledge" -> R.drawable.knowledge
-        "history" -> R.drawable.history
-        "arts_and_literature" -> R.drawable.literature
-        "film_and_tv" -> R.drawable.film
-        "society_and_culture" -> R.drawable.society
-        "geography" -> R.drawable.geography
-        else -> R.drawable.unknown
     }
 }
 

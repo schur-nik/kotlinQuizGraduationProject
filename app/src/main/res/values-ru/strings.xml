@@ -23,5 +23,14 @@
     <string name="levelscreen_easy">Легкий</string>
     <string name="levelscreen_medium">Средний</string>
     <string name="levelscreen_hard">Тяжелый</string>
+    <string name="levelscreen_favorite_topics">Любимые темы:</string>
+    <string name="levelscreen_unfavorite_topics">Другие темы:</string>
+
+    <string name="quizscreen_results">Результаты:</string>
+    <string name="quizscreen_theme">Тема: %1$s</string>
+    <string name="quizscreen_difficulty">Сложность: %1$s</string>
+    <string name="quizscreen_correct_answers">Правильных ответов: %1$s/10</string>
+    <string name="quizscreen_finish">ЗАВЕРШИТЬ</string>
+    <string name="quizscreen_question">Вопрос %1$s</string>
 
 </resources>

@@ -1,24 +1,32 @@
 package com.example.kotlinquizgraduationproject.ui.feature.LevelsScreen
 
 import android.content.res.Configuration
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -30,6 +38,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -38,6 +47,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionOnScreen
@@ -62,8 +72,12 @@ import com.example.kotlinquizgraduationproject.model.usersinfo.LevelProgress
 import com.example.kotlinquizgraduationproject.repository.DBRepository
 import com.example.kotlinquizgraduationproject.ui.fakePackage.FakeQuizRepository
 import com.example.kotlinquizgraduationproject.ui.fakePackage.FakeUserDao
+import com.example.kotlinquizgraduationproject.ui.feature.LevelsScreen.domain.LevelsAction
+import com.example.kotlinquizgraduationproject.ui.feature.LevelsScreen.domain.usecases.ChangeFavoriteUseCase
+import com.example.kotlinquizgraduationproject.ui.feature.LevelsScreen.domain.usecases.LoadFavoriteCategoriesUseCase
 import com.example.kotlinquizgraduationproject.ui.feature.LevelsScreen.domain.usecases.LoadLevelProgressUseCase
 import com.example.kotlinquizgraduationproject.ui.feature.LevelsScreen.domain.usecases.LoadQuestionCategoriesUseCase
+import com.example.kotlinquizgraduationproject.ui.feature.QuizScreen.domain.QuizAction
 import com.example.kotlinquizgraduationproject.ui.navigation.Routes
 import com.example.kotlinquizgraduationproject.utils.translateCategories
 
@@ -75,7 +89,9 @@ fun LevelsScreenPreview() {
         navHostController = navController,
         LevelsViewModel(
             LoadQuestionCategoriesUseCase(FakeQuizRepository().test()),
-            LoadLevelProgressUseCase(DBRepository(FakeUserDao()))
+            LoadLevelProgressUseCase(DBRepository(FakeUserDao())),
+            LoadFavoriteCategoriesUseCase(DBRepository(FakeUserDao())),
+            ChangeFavoriteUseCase(DBRepository(FakeUserDao()))
         )
     )
 }
@@ -90,19 +106,24 @@ fun LevelsScreen(
     val isPortrait = configuration.orientation == Configuration.ORIENTATION_PORTRAIT
     val state by viewModel.state.collectAsState()
 
-    var listCategory = listOf(
-        Category("science"),
-        Category("sport_and_leisure"),
-        Category("food_and_drink"),
-        Category("music"),
-        Category("general_knowledge"),
-        Category("history"),
-        Category("arts_and_literature"),
-        Category("film_and_tv"),
-        Category("society_and_culture"),
-        Category("geography")
-    )
-    var listProgress = listOf(LevelProgress("science", "easy", 6))
+//    var listCategory = listOf(
+//        Category("science"),
+//        Category("sport_and_leisure"),
+//        Category("food_and_drink"),
+//        Category("music"),
+//        Category("general_knowledge"),
+//        Category("history"),
+//        Category("arts_and_literature"),
+//        Category("film_and_tv"),
+//        Category("society_and_culture"),
+//        Category("geography")
+//    )
+//    var listProgress = listOf(LevelProgress("science", "easy", 6))
+//    var listFavorites = listOf(
+//        Category("science"),
+//        Category("sport_and_leisure"),
+//        Category("food_and_drink")
+//    )
 
 
     Scaffold(
@@ -122,12 +143,25 @@ fun LevelsScreen(
                         }
                         if (listCategory.isNotEmpty()) {
                             BlockCategory(
-                                listCategory = listCategory,
+                                listCategory = listFavorites,
                                 listProgress = listProgress,
-                                translateList = translateCategories(LocalContext.current, listCategory),
+                                translateList = translateCategories(LocalContext.current, listFavorites),
                                 onClick = { difficulty, category ->
                                     navHostController.navigate(Routes.QuizScreen.createRoute(difficulty, category))
-                                }
+                                },
+                                favorite = true,
+                                onClickFavorite = {favorite, category -> viewModel.processedAction(LevelsAction.ChangeFavorite(favorite, category))}
+                            )
+                            Spacer(modifier = Modifier.padding(10.dp))
+                            BlockCategory(
+                                listCategory = listCategory - listFavorites.toSet(),
+                                listProgress = listProgress,
+                                translateList = translateCategories(LocalContext.current, listCategory- listFavorites.toSet()),
+                                onClick = { difficulty, category ->
+                                    navHostController.navigate(Routes.QuizScreen.createRoute(difficulty, category))
+                                },
+                                favorite = false,
+                                onClickFavorite = {favorite, category -> viewModel.processedAction(LevelsAction.ChangeFavorite(favorite, category))}
                             )
                         }
                     }
@@ -135,7 +169,6 @@ fun LevelsScreen(
             }
         }
     )
-
 }
 
 @Composable
@@ -143,7 +176,9 @@ fun BlockCategory(
     listCategory: List<Category>,
     listProgress: List<LevelProgress>,
     translateList: List<Category>,
-    onClick: (string1: String, string2: String) -> Unit = { _: String, _: String -> }
+    onClick: (string1: String, string2: String) -> Unit = { _: String, _: String -> },
+    favorite: Boolean,
+    onClickFavorite: (string: String, boolean: Boolean) -> Unit = { _: String, _: Boolean -> },
 ) {
 //    var showTooltip = true
 //    var tooltipMessage = "Best result:\n 6/10"
@@ -152,6 +187,7 @@ fun BlockCategory(
     var tooltipOffset by remember { mutableStateOf(IntOffset(0, 0)) }
 
     val listState = rememberLazyListState()
+    var expandedStates by remember { mutableStateOf(false) }
 
     LaunchedEffect(listState) {
         snapshotFlow { listState.isScrollInProgress }.collect { isScrolling ->
@@ -165,24 +201,47 @@ fun BlockCategory(
         Tooltip(tooltipMessage, tooltipOffset) { showTooltip = false }
     }
 
-    LazyColumn(
-        state = listState,
-        modifier = Modifier
-            .fillMaxWidth(),
-        contentPadding = PaddingValues(0.dp)
-    ) {
-        items(listCategory.size) { index ->
-            CategoryItem(
-                category = listCategory[index],
-                translatedName = translateList[index].name,
-                progress = listProgress,
-                onClick = onClick,
-                showTooltip = { message, offset ->
-                    tooltipMessage = message
-                    tooltipOffset = offset
-                    showTooltip = true
-                }
-            )
+    if (!favorite) {
+        Box(modifier = Modifier.fillMaxWidth()) {
+            Row(modifier = Modifier
+                .height(24.dp)
+                .border(1.dp, Color.Black)
+                .padding(start = 3.dp)
+                .clickable { expandedStates = !expandedStates }) {
+                Text(text = "Unfavorite topics:", fontSize = 15.sp, modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f))
+                Icon(imageVector = if (expandedStates) Icons.Filled.KeyboardArrowUp else Icons.Filled.KeyboardArrowDown, contentDescription = null)
+            }
+        }
+    }
+    else {
+        expandedStates = true
+        Text(text = "Favorite topics:", fontSize = 15.sp)
+    }
+
+    if (expandedStates) {
+        LazyColumn(
+            state = listState,
+            modifier = Modifier
+                .fillMaxWidth(),
+            contentPadding = PaddingValues(0.dp)
+        ) {
+            items(listCategory.size) { index ->
+                CategoryItem(
+                    category = listCategory[index],
+                    translatedName = translateList[index].name,
+                    progress = listProgress,
+                    onClick = onClick,
+                    showTooltip = { message, offset ->
+                        tooltipMessage = message
+                        tooltipOffset = offset
+                        showTooltip = true
+                    },
+                    favorite = favorite,
+                    onClickFavorite = onClickFavorite
+                )
+            }
         }
     }
 }
@@ -196,7 +255,10 @@ fun Tooltip(message: String, offset: IntOffset, onClose: () -> Unit) {
                 .border(1.dp, Color.Gray, RoundedCornerShape(8.dp))
                 .padding(0.dp)
         ) {
-            IconButton(onClick = onClose, modifier = Modifier.size(15.dp).align(Alignment.TopEnd).padding(0.dp)) {
+            IconButton(onClick = onClose, modifier = Modifier
+                .size(15.dp)
+                .align(Alignment.TopEnd)
+                .padding(0.dp)) {
                 Icon(imageVector = Icons.Default.Close, contentDescription = "Close")
             }
             Text(text = message, textAlign = TextAlign.Center, modifier = Modifier.padding(horizontal = 13.dp, vertical = 8.dp))
@@ -210,24 +272,49 @@ fun CategoryItem(
     translatedName: String,
     progress: List<LevelProgress>,
     onClick: (String, String) -> Unit,
-    showTooltip: (String, IntOffset) -> Unit
+    showTooltip: (String, IntOffset) -> Unit,
+    favorite: Boolean,
+    onClickFavorite: (String, Boolean) -> Unit
 ) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(top = 5.dp)
+            .padding(top = 10.dp)
             .background(getCategoryColor(category))
     ) {
         Image(
             painter = painterResource(id = getCategoryImage(category)),
             contentDescription = null,
-            modifier = Modifier.size(80.dp).align(Alignment.CenterEnd).padding(bottom = 50.dp)
+            modifier = Modifier
+                .size(80.dp)
+                .align(Alignment.CenterEnd)
+                .padding(bottom = 50.dp)
         )
-        Row(modifier = Modifier.fillMaxSize().padding(10.dp)) {
+        Row(modifier = Modifier
+            .fillMaxSize()
+            .padding(10.dp)) {
             Column(modifier = Modifier.weight(1f)) {
                 Text(translatedName, fontSize = 24.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(start = 5.dp, bottom = 5.dp))
                 DifficultyButtons(category, progress, onClick, showTooltip)
             }
+        }
+        Button(
+            onClick = { Log.e("TRY BUTTON" ,"FOR "+category.name+" and favoris = "+favorite.toString()) ; onClickFavorite(category.name, favorite)},
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .size(25.dp)
+                .offset(x = 5.dp, y = (-5).dp),
+            contentPadding = PaddingValues(0.dp),
+            colors = ButtonDefaults.buttonColors(Color.White, Color.White),
+            shape = RoundedCornerShape(8.dp)
+        ) {
+            Image(
+                painter = painterResource(id = R.drawable.star_default),
+                contentDescription = null,
+                modifier = Modifier
+                    .size(25.dp),
+                colorFilter = ColorFilter.lighting(Color.Black, if (favorite) Color.Red else Color.Black)
+            )
         }
     }
 }
@@ -249,7 +336,9 @@ fun DifficultyButtons(
                     else -> R.string.levelscreen_easy
                 }),
                 onClick = { onClick(difficulty, category.name) },
-                modifier = Modifier.weight(1f).padding(1.dp),
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(1.dp),
                 onImageClick = { offset ->
                     val bestResult = progress.find { it.category == category.name && it.difficulty == difficulty }?.progress ?: 0
                     showTooltip("Best result:\n $bestResult / 10", offset)
@@ -295,7 +384,10 @@ fun DifficultyButton(
                     .pointerInput(Unit) {
                         detectTapGestures { _ ->
                             onImageClick(
-                                IntOffset(buttonPosition.x.toInt() - 50, buttonPosition.y.toInt() - 15)
+                                IntOffset(
+                                    buttonPosition.x.toInt() - 50,
+                                    buttonPosition.y.toInt() - 15
+                                )
                             )
                         }
                     }

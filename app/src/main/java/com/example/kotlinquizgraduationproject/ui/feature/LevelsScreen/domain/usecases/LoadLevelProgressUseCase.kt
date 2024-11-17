@@ -17,8 +17,11 @@ class LoadLevelProgressUseCase @Inject constructor(
 
     fun loadLevelProgress(): Flow<LevelsResult> {
         return flow {
-            val allUsers = dbRepository.getAllUsers()
-            Log.e("allUsers", allUsers.toString())
+            //TEST
+            Log.e("SharedPreferencesRepository", "USER = "+SharedPreferencesRepository.getUserId())
+            val responseUser = dbRepository.getAllUsers()
+            Log.e("BD USER", responseUser.toString())
+            //TEST
 
             val responseProgress = dbRepository.getProgress(SharedPreferencesRepository.getUserId())
             val levelProgress = responseProgress.map { entity -> LevelProgress(entity.category, entity.difficulty, entity.progress) }

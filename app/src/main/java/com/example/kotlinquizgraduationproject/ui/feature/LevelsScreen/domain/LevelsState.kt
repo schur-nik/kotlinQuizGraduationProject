@@ -7,4 +7,5 @@ data class LevelsState(
     val isLoading: Boolean = false,
     val listCategory: List<Category> = arrayListOf(),
     val listProgress: List<LevelProgress> = arrayListOf(),
+    val listFavorites: List<Category> = arrayListOf(),
 )

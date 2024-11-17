@@ -18,7 +18,7 @@ object DBModule {
     @Provides
     @Singleton
     fun provideDB(@ApplicationContext context: Context) : UserInfoDB {
-        return Room.databaseBuilder(context, UserInfoDB::class.java, name = "userInfoDB4").build()
+        return Room.databaseBuilder(context, UserInfoDB::class.java, name = "userInfoDB6").build()
     }
 
     @Provides

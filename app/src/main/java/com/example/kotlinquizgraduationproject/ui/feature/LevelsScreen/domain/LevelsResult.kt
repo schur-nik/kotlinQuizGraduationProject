@@ -13,4 +13,8 @@ sealed class LevelsResult {
 
     data class LevelsProgressLoaded(val listProgress: List<LevelProgress>) : LevelsResult()
 
+    data class FavoriteCategoriesLoaded(val listFavorites: List<Category>) : LevelsResult()
+
+    data class FavoriteCategoriesChanged(val listFavorites: List<Category>) : LevelsResult()
+
 }

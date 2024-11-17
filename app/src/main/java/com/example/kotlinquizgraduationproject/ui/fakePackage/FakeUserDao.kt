@@ -1,6 +1,7 @@
 package com.example.kotlinquizgraduationproject.ui.fakePackage
 
 import com.example.kotlinquizgraduationproject.database.dao.UserDao
+import com.example.kotlinquizgraduationproject.database.entity.FavoriteCategoryEntity
 import com.example.kotlinquizgraduationproject.database.entity.LevelProgressEntity
 import com.example.kotlinquizgraduationproject.database.entity.UserEntity
 
@@ -34,6 +35,18 @@ class FakeUserDao : UserDao {
     }
 
     override suspend fun getProgress(u_id: Int): List<LevelProgressEntity> {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun getAllFavoriteCategories(userId: Int): List<FavoriteCategoryEntity> {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun addFavoriteCategory(favoriteCategoryEntity: FavoriteCategoryEntity) {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun deleteFavoriteCategory(favoriteCategoryEntity: FavoriteCategoryEntity) {
         TODO("Not yet implemented")
     }
 

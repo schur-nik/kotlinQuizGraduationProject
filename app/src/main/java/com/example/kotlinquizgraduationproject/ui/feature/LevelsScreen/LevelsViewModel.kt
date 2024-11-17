@@ -5,6 +5,8 @@ import androidx.lifecycle.viewModelScope
 import com.example.kotlinquizgraduationproject.ui.feature.LevelsScreen.domain.LevelsAction
 import com.example.kotlinquizgraduationproject.ui.feature.LevelsScreen.domain.LevelsResult
 import com.example.kotlinquizgraduationproject.ui.feature.LevelsScreen.domain.LevelsState
+import com.example.kotlinquizgraduationproject.ui.feature.LevelsScreen.domain.usecases.ChangeFavoriteUseCase
+import com.example.kotlinquizgraduationproject.ui.feature.LevelsScreen.domain.usecases.LoadFavoriteCategoriesUseCase
 import com.example.kotlinquizgraduationproject.ui.feature.LevelsScreen.domain.usecases.LoadLevelProgressUseCase
 import com.example.kotlinquizgraduationproject.ui.feature.LevelsScreen.domain.usecases.LoadQuestionCategoriesUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -15,7 +17,9 @@ import javax.inject.Inject
 @HiltViewModel
 class LevelsViewModel @Inject constructor(
     private val loadQuestionCategoriesUseCase: LoadQuestionCategoriesUseCase,
-    private val loadLevelProgressUseCase: LoadLevelProgressUseCase
+    private val loadLevelProgressUseCase: LoadLevelProgressUseCase,
+    private val loadFavoriteCategoriesUseCase: LoadFavoriteCategoriesUseCase,
+    private val changeFavoriteUseCase: ChangeFavoriteUseCase
 ) : ViewModel() {
 
 
@@ -24,13 +28,16 @@ class LevelsViewModel @Inject constructor(
     init {
         processedAction(LevelsAction.Init)
         processedAction(LevelsAction.LoadProgress)
+        processedAction(LevelsAction.LoadFavorites)
     }
 
-    private fun processedAction(action: LevelsAction) {
+    fun processedAction(action: LevelsAction) {
         viewModelScope.launch {
             when (action) {
                 is LevelsAction.Init -> loadQuestionCategoriesUseCase.loadListOfQuestionCategories()
                 is LevelsAction.LoadProgress -> loadLevelProgressUseCase.loadLevelProgress()
+                is LevelsAction.LoadFavorites -> loadFavoriteCategoriesUseCase.loadFavoriteCategories()
+                is LevelsAction.ChangeFavorite -> changeFavoriteUseCase.changeFavorite(action.category, action.favorite)
             }.collect { result ->
                 handleResult(result)
             }
@@ -65,6 +72,22 @@ class LevelsViewModel @Inject constructor(
                 state.emit(
                     state.value.copy(
                         listProgress = result.listProgress,
+                    )
+                )
+            }
+
+            is LevelsResult.FavoriteCategoriesLoaded -> {
+                state.emit(
+                    state.value.copy(
+                        listFavorites = result.listFavorites,
+                    )
+                )
+            }
+
+            is LevelsResult.FavoriteCategoriesChanged -> {
+                state.emit(
+                    state.value.copy(
+                        listFavorites = result.listFavorites,
                     )
                 )
             }

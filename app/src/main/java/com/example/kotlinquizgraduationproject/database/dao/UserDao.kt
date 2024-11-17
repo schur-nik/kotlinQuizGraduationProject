@@ -1,10 +1,12 @@
 package com.example.kotlinquizgraduationproject.database.dao
 
 import androidx.room.Dao
+import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
+import com.example.kotlinquizgraduationproject.database.entity.FavoriteCategoryEntity
 import com.example.kotlinquizgraduationproject.database.entity.LevelProgressEntity
 import com.example.kotlinquizgraduationproject.database.entity.UserEntity
 import com.example.kotlinquizgraduationproject.model.usersinfo.User
@@ -21,6 +23,7 @@ interface UserDao {
     @Query("SELECT * FROM Users")
     suspend fun getAllUsers() : List<UserEntity>
 
+
     @Insert
     suspend fun addLevelProgress(levelProgressEntity: LevelProgressEntity)
 
@@ -33,5 +36,14 @@ interface UserDao {
     @Query("SELECT * FROM LevelProgress WHERE u_id == :userId")
     suspend fun getProgress(userId: Int) : List<LevelProgressEntity>
 
+
+    @Query("SELECT * FROM FavoriteCategory WHERE u_id == :userId")
+    suspend fun getAllFavoriteCategories(userId: Int) : List<FavoriteCategoryEntity>
+
+    @Insert
+    suspend fun addFavoriteCategory(favoriteCategoryEntity: FavoriteCategoryEntity)
+
+    @Delete
+    suspend fun deleteFavoriteCategory(favoriteCategoryEntity: FavoriteCategoryEntity)
 
 }

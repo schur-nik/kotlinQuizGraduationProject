@@ -29,5 +29,9 @@
     <string name="quizscreen_correct_answers">Correct Answers: %1$s/10</string>
     <string name="quizscreen_finish">FINISH</string>
     <string name="quizscreen_question">Question %1$s</string>
+    <string name="splash_welcome_to_quiz">Welcome to Quiz</string>
+    <string name="splash_please_enter_your_name">Please, enter your name:</string>
+    <string name="splash_type_name_here">type name here</string>
+    <string name="splash_continue">Continue</string>
 
 </resources>

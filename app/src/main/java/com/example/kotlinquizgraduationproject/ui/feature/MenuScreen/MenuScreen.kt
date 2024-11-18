@@ -37,8 +37,7 @@ import com.example.kotlinquizgraduationproject.R
 import com.example.kotlinquizgraduationproject.repository.DBRepository
 import com.example.kotlinquizgraduationproject.repository.SharedPreferencesRepository
 import com.example.kotlinquizgraduationproject.ui.fakePackage.FakeUserDao
-import com.example.kotlinquizgraduationproject.ui.feature.MenuScreen.domain.MenuAction
-import com.example.kotlinquizgraduationproject.ui.feature.MenuScreen.domain.usecases.AddUserToDBUseCase
+import com.example.kotlinquizgraduationproject.ui.SplashScreen.domain.usecases.AddUserToDBUseCase
 import com.example.kotlinquizgraduationproject.ui.navigation.Routes
 
 @Preview(showBackground = true)
@@ -47,7 +46,7 @@ fun MenuScreenPreview() {
     val navController = rememberNavController()
     MenuScreen(
         navHostController = navController,
-        MenuViewModel(AddUserToDBUseCase(DBRepository(FakeUserDao())))
+        MenuViewModel()
     )
 }
 
@@ -56,11 +55,6 @@ fun MenuScreen(
     navHostController: NavHostController,
     viewModel: MenuViewModel = hiltViewModel()
 ) {
-
-    if (SharedPreferencesRepository.getUserId() == 0) {
-        Log.e("SharedPreferencesRepository", "USER_ID = "+SharedPreferencesRepository.getUserId())
-        viewModel.processedAction(MenuAction.AddUserToDB)
-    }
 
     Scaffold(
         content = { padding ->
@@ -72,8 +66,7 @@ fun MenuScreen(
                     contentDescription = null,
                     modifier = Modifier
                         .align(Alignment.CenterEnd)
-                        .fillMaxSize()
-                        .padding(bottom = 50.dp),
+                        .fillMaxSize(),
                     contentScale = ContentScale.Crop
                 )
                 Column(

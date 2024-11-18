@@ -129,7 +129,6 @@ fun LevelsScreen(
 //        Category("food_and_drink")
 //    )
 
-
     Scaffold(
         content = { padding ->
             Box(
@@ -144,8 +143,10 @@ fun LevelsScreen(
                 ) {
                     state.run {
                         item {
-                            if (state.isLoading) {
-                                CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+                            if (isLoading) {
+                                Column(modifier = Modifier.fillMaxWidth()) {
+                                    CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
+                                }
                             }
                         }
                         if (listCategory.isNotEmpty()) {

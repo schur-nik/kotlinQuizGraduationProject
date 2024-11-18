@@ -7,6 +7,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.example.kotlinquizgraduationproject.model.quizinfo.LevelInformation
+import com.example.kotlinquizgraduationproject.repository.SharedPreferencesRepository
+import com.example.kotlinquizgraduationproject.ui.SplashScreen.SplashScreen
 import com.example.kotlinquizgraduationproject.ui.feature.LevelsScreen.LevelsScreen
 import com.example.kotlinquizgraduationproject.ui.feature.MenuScreen.MenuScreen
 import com.example.kotlinquizgraduationproject.ui.feature.QuizScreen.QuizScreen
@@ -15,7 +17,12 @@ import com.example.kotlinquizgraduationproject.ui.feature.QuizScreen.QuizScreen
 fun AppGraph(
     navController: NavHostController
 ) {
-    NavHost(navController = navController, startDestination = Routes.MenuScreen.route) {
+    val startDestination = if (SharedPreferencesRepository.isFirstLaunch()) Routes.SplashScreen.route else Routes.MenuScreen.route
+
+    NavHost(navController = navController, startDestination = startDestination) {
+        composable(Routes.SplashScreen.route) {
+            SplashScreen(navController)
+        }
         composable(Routes.MenuScreen.route) {
             MenuScreen(navController)
         }

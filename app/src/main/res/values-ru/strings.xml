@@ -15,6 +15,11 @@
     <string name="society_and_culture">Общество и культура</string>
     <string name="geography">География</string>
 
+    <string name="splash_welcome_to_quiz">Добро пожаловать!</string>
+    <string name="splash_please_enter_your_name">Пожалуйста, введите ваше имя:</string>
+    <string name="splash_type_name_here">поле для имени</string>
+    <string name="splash_continue">Продолжить</string>
+
     <string name="menubutton_levels">Играть!</string>
     <string name="menubutton_profile">Профиль</string>
     <string name="menubutton_settings">Настройка</string>

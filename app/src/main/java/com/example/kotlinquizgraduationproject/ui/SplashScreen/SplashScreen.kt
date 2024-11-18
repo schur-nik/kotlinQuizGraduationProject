@@ -134,7 +134,7 @@ fun SplashScreen(
                                 modifier = Modifier
                                     .align(Alignment.CenterHorizontally)
                                     .fillMaxWidth(),
-                                fontSize = 32.sp,
+                                fontSize = 26.sp,
                                 fontWeight = FontWeight.ExtraBold,
                                 lineHeight = 45.sp,
                                 textAlign = TextAlign.Center

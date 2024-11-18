@@ -58,6 +58,7 @@ import com.example.kotlinquizgraduationproject.repository.SharedPreferencesRepos
 import com.example.kotlinquizgraduationproject.ui.SplashScreen.domain.SplashAction
 import com.example.kotlinquizgraduationproject.ui.fakePackage.FakeUserDao
 import com.example.kotlinquizgraduationproject.ui.SplashScreen.domain.usecases.AddUserToDBUseCase
+import com.example.kotlinquizgraduationproject.ui.navigation.Routes
 
 @Preview(showBackground = true)
 @Composable
@@ -178,7 +179,7 @@ fun SplashScreen(
                                             Category("film_and_tv"),
                                         )))
                                         SharedPreferencesRepository.setFirstLaunch()
-                                        navHostController.navigate("MenuScreen") {
+                                        navHostController.navigate(Routes.MenuScreen.route) {
                                             popUpTo(navHostController.graph.startDestinationId) { inclusive = true }
                                         }
                                     },

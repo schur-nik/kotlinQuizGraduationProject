@@ -218,7 +218,9 @@ fun EndQuizScreen(
                         .fillMaxWidth()
                 ) {
                     Button(
-                        onClick = { navHostController.navigate(Routes.LevelsScreen.route) },
+                        onClick = { navHostController.navigate(Routes.LevelsScreen.route) {
+                                popUpTo(navHostController.graph.startDestinationId) { inclusive = false }
+                            }},
                         modifier = Modifier
                             .background(
                                 brush = Brush.verticalGradient(

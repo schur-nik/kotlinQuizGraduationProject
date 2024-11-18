@@ -37,5 +37,6 @@
     <string name="quizscreen_correct_answers">Правильных ответов: %1$s/10</string>
     <string name="quizscreen_finish">ЗАВЕРШИТЬ</string>
     <string name="quizscreen_question">Вопрос %1$s</string>
+    <string name="quizscreen_share_results">Поделиться итогами квиза</string>
 
 </resources>

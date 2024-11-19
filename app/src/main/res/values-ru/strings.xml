@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">kotlinQuizGraduationProject</string>
+    <string name="app_name">QuizProject</string>
     <string name="title_activity_main">MainActivity</string>
     <string name="greating">Добро пожаловать в Quiz!</string>
 

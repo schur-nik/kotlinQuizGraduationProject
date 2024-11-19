@@ -310,7 +310,7 @@ fun CategoryItem(
             }
         }
         Button(
-            onClick = { Log.e("TRY BUTTON" ,"FOR "+category.name+" and favoris = "+favorite.toString()) ; onClickFavorite(category.name, favorite)},
+            onClick = { onClickFavorite(category.name, favorite)},
             modifier = Modifier
                 .align(Alignment.TopEnd)
                 .size(25.dp)
@@ -433,12 +433,3 @@ fun DifficultyButton(
         }
     }
 }
-
-//@Composable
-//fun DynamicText(text: String) {
-//    val textSize = when (text.length) {
-//        in 0..5 -> 24.sp
-//        in 6..10 -> 20.sp
-//        else -> 16.sp
-//    }
-//}

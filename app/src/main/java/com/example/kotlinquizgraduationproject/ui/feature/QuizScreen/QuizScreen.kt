@@ -119,7 +119,7 @@ fun QuizScreen(
                     if (isLoading) {
                         CircularProgressIndicator(modifier = Modifier.fillMaxSize())
                     } else {
-                        state.currentQuestion?.let { currentQuestion ->
+                        currentQuestion?.let { currentQuestion ->
                             QuizContent(
                                 levelInformation = levelInformation,
                                 currentQuestion = currentQuestion,
@@ -339,7 +339,11 @@ fun ProgressAndNavigation(state: QuizState, finishClick: () -> Unit, nextClick: 
                     ),
                     shape = RoundedCornerShape(8.dp)
                 )
-                .height(40.dp)
+                .height(40.dp),
+            colors = ButtonDefaults.buttonColors(
+                Color.Transparent,
+                Color.White
+            ),
         ) {
             Text(text = if (state.currentNumber + 1 >= state.questionCount) "END" else "NEXT")
         }

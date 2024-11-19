@@ -8,6 +8,7 @@ private const val APP_PREFERENCES = "APP_PREFERENCES"
 private const val USER_PREFERENCES = "USER_PREFERENCES"
 private const val IS_FIRST_LAUNCH = "IS_FIRST_LAUNCH"
 private const val USER_ID = "USER_ID"
+private const val LANGUAGE = "LANGUAGE"
 
 object SharedPreferencesRepository {
 
@@ -36,6 +37,16 @@ object SharedPreferencesRepository {
     fun setUserId(id: Int) {
         userPreferences?.edit {
             putInt(USER_ID, id)
+        }
+    }
+
+    fun getLanguage(): String {
+        return userPreferences?.getString(LANGUAGE, "unknown").toString()
+    }
+
+    fun setLanguage(string: String) {
+        userPreferences?.edit {
+            putString(LANGUAGE, string)
         }
     }
 

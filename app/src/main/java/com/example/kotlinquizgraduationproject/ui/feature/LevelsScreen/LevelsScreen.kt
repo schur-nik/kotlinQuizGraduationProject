@@ -122,13 +122,13 @@ fun LevelsScreen(
                 ) {
                     state.run {
                         item {
-                            if (isLoading) {
+                            if (state.isLoading) {
                                 Column(modifier = Modifier.fillMaxWidth()) {
                                     CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
                                 }
                             }
                         }
-                        if (listCategory.isNotEmpty()) {
+                        if (state.listCategory.isNotEmpty()) {
                             item {
                                 BlockCategory(
                                     listCategory = listFavorites,
@@ -155,6 +155,16 @@ fun LevelsScreen(
                                     onClickFavorite = { favorite, category -> viewModel.processedAction(LevelsAction.ChangeFavorite(favorite, category)) },
                                     listState = listState
                                 )
+                            }
+                        }
+                        item {
+                            if (state.isFailure) {
+                                Column(modifier = Modifier.fillMaxWidth()) {
+                                    CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
+                                    Text(text = "CONNECTION_ERROR", modifier = Modifier.align(Alignment.CenterHorizontally))
+                                    Spacer(modifier = Modifier.padding(100.dp))
+                                    Text(text = "Please, try again later", modifier = Modifier.align(Alignment.CenterHorizontally), fontSize = 30.sp)
+                                }
                             }
                         }
                     }

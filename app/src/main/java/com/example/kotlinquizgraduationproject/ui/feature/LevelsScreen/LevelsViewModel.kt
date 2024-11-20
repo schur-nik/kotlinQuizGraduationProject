@@ -55,6 +55,7 @@ class LevelsViewModel @Inject constructor(
                 state.emit(
                     state.value.copy(
                         isLoading = false,
+                        isFailure = false,
                         listCategory = result.listCategory
                     )
                 )
@@ -64,6 +65,7 @@ class LevelsViewModel @Inject constructor(
                 state.emit(
                     state.value.copy(
                         isLoading = false,
+                        isFailure = true
                     )
                 )
             }

@@ -1,9 +1,9 @@
-package com.example.kotlinquizgraduationproject.ui.SplashScreen
+package com.example.kotlinquizgraduationproject.ui.feature.SplashScreen
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.kotlinquizgraduationproject.ui.SplashScreen.domain.SplashAction
-import com.example.kotlinquizgraduationproject.ui.SplashScreen.domain.usecases.AddUserToDBUseCase
+import com.example.kotlinquizgraduationproject.ui.feature.SplashScreen.domain.SplashAction
+import com.example.kotlinquizgraduationproject.ui.feature.SplashScreen.domain.usecases.AddUserToDBUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject

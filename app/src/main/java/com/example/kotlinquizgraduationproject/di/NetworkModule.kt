@@ -1,9 +1,12 @@
 package com.example.kotlinquizgraduationproject.di
 
+import android.content.Context
+import com.example.kotlinquizgraduationproject.R
 import com.example.kotlinquizgraduationproject.network.QuizApi
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -17,11 +20,11 @@ class NetworkModule {
 
     @Provides
     @Singleton
-    fun provideQuizApi(): QuizApi {
+    fun provideQuizApi(@ApplicationContext context: Context): QuizApi {
         val retrofit =
             Retrofit
                 .Builder()
-                .baseUrl("https://the-trivia-api.com/v2/")
+                .baseUrl(context.getString(R.string.baseUrl))
                 .client(
                     OkHttpClient()
                         .newBuilder()

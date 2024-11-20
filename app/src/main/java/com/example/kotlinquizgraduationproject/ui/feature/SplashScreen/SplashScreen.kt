@@ -1,4 +1,4 @@
-package com.example.kotlinquizgraduationproject.ui.SplashScreen
+package com.example.kotlinquizgraduationproject.ui.feature.SplashScreen
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
@@ -48,9 +48,9 @@ import com.example.kotlinquizgraduationproject.R
 import com.example.kotlinquizgraduationproject.model.quizinfo.Category
 import com.example.kotlinquizgraduationproject.repository.DBRepository
 import com.example.kotlinquizgraduationproject.repository.SharedPreferencesRepository
-import com.example.kotlinquizgraduationproject.ui.SplashScreen.domain.SplashAction
+import com.example.kotlinquizgraduationproject.ui.feature.SplashScreen.domain.SplashAction
 import com.example.kotlinquizgraduationproject.ui.fakePackage.FakeUserDao
-import com.example.kotlinquizgraduationproject.ui.SplashScreen.domain.usecases.AddUserToDBUseCase
+import com.example.kotlinquizgraduationproject.ui.feature.SplashScreen.domain.usecases.AddUserToDBUseCase
 import com.example.kotlinquizgraduationproject.ui.navigation.Routes
 
 @Preview(showBackground = true)
@@ -177,7 +177,8 @@ fun SplashScreen(
                             if (name.length > 2) {
                                 Button(
                                     onClick = {
-                                        viewModel.processedAction(SplashAction.AddUserToDB(name, listOf(
+                                        viewModel.processedAction(
+                                            SplashAction.AddUserToDB(name, listOf(
                                             Category("general_knowledge"),
                                             Category("music"),
                                             Category("food_and_drink"),

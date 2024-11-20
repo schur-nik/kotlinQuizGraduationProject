@@ -2,7 +2,6 @@ package com.example.kotlinquizgraduationproject.ui.feature.MenuScreen
 
 import android.app.Activity
 import android.content.Context
-import android.content.res.Configuration
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -30,6 +29,7 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -56,6 +56,9 @@ import com.example.kotlinquizgraduationproject.R
 import com.example.kotlinquizgraduationproject.repository.SharedPreferencesRepository
 import com.example.kotlinquizgraduationproject.ui.navigation.Routes
 import com.example.kotlinquizgraduationproject.utils.updateLocale
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.firebase.auth.FirebaseAuth
 
 @Preview(showBackground = true)
 @Composable
@@ -73,6 +76,7 @@ fun MenuScreen(
     viewModel: MenuViewModel = hiltViewModel()
 ) {
     var showSettingsDialog by remember { mutableStateOf(false) }
+    var showProfileDialog by remember { mutableStateOf(false) }
     var isEnglish by remember { mutableStateOf(SharedPreferencesRepository.getLanguage() == "en") }
     val context = LocalContext.current
 
@@ -102,7 +106,7 @@ fun MenuScreen(
                 ) {
                     Spacer(modifier = Modifier.padding(15.dp))
                     Text(
-                        text = stringResource(R.string.greating),
+                        text = stringResource(R.string.menu_greating),
                         modifier = Modifier
                             .align(Alignment.CenterHorizontally)
                             .padding(horizontal = 60.dp)
@@ -114,7 +118,7 @@ fun MenuScreen(
                         textAlign = TextAlign.Center,
                     )
                     MenuButton(stringResource(R.string.menubutton_levels), { navHostController.navigate(Routes.LevelsScreen.route) }, Modifier.align(Alignment.CenterHorizontally))
-                    MenuButton(stringResource(R.string.menubutton_profile), {}, Modifier.align(Alignment.CenterHorizontally))
+                    MenuButton(stringResource(R.string.menubutton_profile), {showProfileDialog = true}, Modifier.align(Alignment.CenterHorizontally))
                     MenuButton(stringResource(R.string.menubutton_settings), { showSettingsDialog = true }, Modifier.align(Alignment.CenterHorizontally))
                     MenuButton(stringResource(R.string.menubutton_exit), { exitApp(context) }, Modifier.align(Alignment.CenterHorizontally))
                 }
@@ -126,10 +130,11 @@ fun MenuScreen(
                     onToggleLanguage = { newIsEnglish -> isEnglish = newIsEnglish }
                 )
             }
-            Text(text = "USER_ID = "+SharedPreferencesRepository.getUserId().toString(), modifier = Modifier.padding(top = 15.dp))
-            Text(text = "LOCALE = "+SharedPreferencesRepository.getLanguage())
-            Text(text = "isFirstLaunch = "+SharedPreferencesRepository.isFirstLaunch(), modifier = Modifier.padding(top = 30.dp))
-        }
+
+            if (showProfileDialog) {
+                ProfileScreen(onDismiss = { showProfileDialog = false })
+            }
+       }
     )
 
 }
@@ -169,6 +174,110 @@ private fun MenuButton(name: String, onClick: () -> Unit, modifier: Modifier = M
 }
 
 @Composable
+fun ProfileScreen(onDismiss: () -> Unit) {
+    val context = LocalContext.current
+    val auth: FirebaseAuth = FirebaseAuth.getInstance()
+    var userEmail by remember { mutableStateOf("") }
+    var userId by remember { mutableStateOf("") }
+    var isSignedIn by remember { mutableStateOf(false) }
+
+    val currentUser  = auth.currentUser
+    if (currentUser  != null) {
+        userEmail = currentUser .email ?: ""
+        userId = currentUser .uid
+        isSignedIn = true
+    }
+
+    LaunchedEffect(Unit) {
+        auth.addAuthStateListener { firebaseAuth ->
+            val user = firebaseAuth.currentUser
+            if (user != null) {
+                userEmail = user.email ?: ""
+                userId = user.uid
+                isSignedIn = true
+            } else {
+                userEmail = ""
+                userId = ""
+                isSignedIn = false
+            }
+        }
+    }
+
+    Dialog(onDismissRequest = onDismiss) {
+        Box(
+            modifier = Modifier
+                .size(width = 300.dp, height = 200.dp)
+                .background(Color.White, RoundedCornerShape(16.dp))
+                .padding(16.dp)
+        ) {
+            Column {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Box(modifier = Modifier.fillMaxWidth()) {
+                        IconButton(onClick = onDismiss, modifier = Modifier.align(Alignment.CenterEnd)) {
+                            Icon(
+                                imageVector = Icons.Filled.Close,
+                                contentDescription = "Close",
+                            )
+                        }
+                        Text(
+                            text = stringResource(R.string.menu_profile),
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 20.sp,
+                            modifier = Modifier.align(Alignment.Center),
+                            textAlign = TextAlign.Center
+                        )
+                    }
+                }
+                Spacer(modifier = Modifier.padding(5.dp))
+                Text(text = userEmail, fontSize = 14.sp, textAlign = TextAlign.Center, modifier= Modifier.fillMaxWidth())
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    if (isSignedIn) {
+                        Button(onClick = {
+                            auth.signOut()
+                            isSignedIn = false
+                            userEmail = ""
+                            userId = ""
+                        }) {
+                            Text(text = stringResource(R.string.menu_log_out),
+                                 modifier = Modifier.width(150.dp),
+                                 textAlign = TextAlign.Center)
+                        }
+                    } else {
+                        Button(onClick = { signInWithGoogle(context, auth) }
+                        ) {
+                            Text(text = stringResource(R.string.menu_sign_in_google_account),
+                                 modifier = Modifier.width(150.dp),
+                                 textAlign = TextAlign.Center)
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+private fun signInWithGoogle(context: Context, auth: FirebaseAuth) {
+    val RC_SIGN_IN = 9001;
+    val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+        .requestIdToken(context.getString(R.string.web_client_id))
+        .requestEmail()
+        .build()
+
+    val googleSignInClient = GoogleSignIn.getClient(context, gso)
+
+    val signInIntent = googleSignInClient.signInIntent
+    (context as Activity).startActivityForResult(signInIntent, RC_SIGN_IN)
+}
+
+@Composable
 fun SettingsDialog(onDismiss: () -> Unit, isEnglish: Boolean, onToggleLanguage: (Boolean) -> Unit) {
     val context = LocalContext.current
 
@@ -192,7 +301,7 @@ fun SettingsDialog(onDismiss: () -> Unit, isEnglish: Boolean, onToggleLanguage: 
                             )
                         }
                         Text(
-                            text = "Settings",
+                            text = stringResource(R.string.menu_settings),
                             fontWeight = FontWeight.Bold,
                             fontSize = 20.sp,
                             modifier = Modifier.align(Alignment.Center),
@@ -208,8 +317,8 @@ fun SettingsDialog(onDismiss: () -> Unit, isEnglish: Boolean, onToggleLanguage: 
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    Text(text = "Select Language:")
-                    Text(text = "RU")
+                    Text(text = stringResource(R.string.menu_select_language))
+                    Text(text = stringResource(R.string.menu_ru))
                     Switch(
                         checked = isEnglish,
                         onCheckedChange = { isChecked ->
@@ -221,21 +330,18 @@ fun SettingsDialog(onDismiss: () -> Unit, isEnglish: Boolean, onToggleLanguage: 
                         colors = SwitchDefaults.colors(
                             checkedThumbColor = colorResource(id = R.color.main_blue),
                             uncheckedThumbColor = colorResource(id = R.color.main_blue),
-                            checkedTrackColor = Color.LightGray, // Цвет дорожки при включенном состоянии
-                            uncheckedTrackColor = Color.LightGray // Цвет дорожки при выключенном состоянии
+                            checkedTrackColor = Color.LightGray,
+                            uncheckedTrackColor = Color.LightGray
                         )
                     )
-                    Text(text = "ENG")
+                    Text(text = stringResource(R.string.menu_eng))
                 }
             }
         }
     }
 }
 
+
 private fun exitApp(context: Context) {
     (context as? Activity)?.finish()
-}
-
-@Composable
-fun SplashImage() {
 }

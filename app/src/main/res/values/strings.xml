@@ -1,7 +1,9 @@
 <resources>
     <string name="app_name">QuizProject</string>
+    <string name="baseUrl" translatable="false">https://the-trivia-api.com/v2/</string>
+    <string name="dbName" translatable="false">userInfoDB6</string>
     <string name="title_activity_main">MainActivity</string>
-    <string name="greating">Welcom to Quiz!</string>
+    <string name="web_client_id" translatable="false">854785425136-sdgs2e5u37bkm3i9i09qindo7epcpliu.apps.googleusercontent.com</string>
 
     <string name="sport_and_leisure">Sport and leisure</string>
     <string name="science">Science</string>
@@ -19,6 +21,14 @@
     <string name="splash_type_name_here">type name here</string>
     <string name="splash_continue">Continue</string>
 
+    <string name="menu_log_out">Log out</string>
+    <string name="menu_sign_in_google_account">Sign in Google account</string>
+    <string name="menu_profile">Profile</string>
+    <string name="menu_settings">Settings</string>
+    <string name="menu_select_language">Select Language:</string>
+    <string name="menu_ru">RU</string>
+    <string name="menu_eng">ENG</string>
+    <string name="menu_greating">Welcome to Quiz!</string>
     <string name="menubutton_levels">Play!</string>
     <string name="menubutton_profile">Profile</string>
     <string name="menubutton_settings">Settings</string>

@@ -1,7 +1,6 @@
 package com.example.kotlinquizgraduationproject.ui.feature.LevelsScreen
 
 import android.content.res.Configuration
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -29,7 +28,6 @@ import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.ButtonElevation
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -109,25 +107,6 @@ fun LevelsScreen(
     val state by viewModel.state.collectAsState()
 
     val listState = rememberLazyListState()
-
-//    var listCategory = listOf(
-//        Category("science"),
-//        Category("sport_and_leisure"),
-//        Category("food_and_drink"),
-//        Category("music"),
-//        Category("general_knowledge"),
-//        Category("history"),
-//        Category("arts_and_literature"),
-//        Category("film_and_tv"),
-//        Category("society_and_culture"),
-//        Category("geography")
-//    )
-//    var listProgress = listOf(LevelProgress("science", "easy", 8))
-//    var listFavorites = listOf(
-//        Category("science"),
-//        Category("sport_and_leisure"),
-//        Category("food_and_drink")
-//    )
 
     Scaffold(
         content = { padding ->

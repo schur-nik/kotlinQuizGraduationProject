@@ -2,7 +2,6 @@
 <resources>
     <string name="app_name">QuizProject</string>
     <string name="title_activity_main">MainActivity</string>
-    <string name="greating">Добро пожаловать в Quiz!</string>
 
     <string name="sport_and_leisure">Спорт и отдых</string>
     <string name="science">Наука</string>
@@ -20,10 +19,18 @@
     <string name="splash_type_name_here">поле для имени</string>
     <string name="splash_continue">Продолжить</string>
 
+    <string name="menu_greating">Добро пожаловать в Quiz!</string>
     <string name="menubutton_levels">Играть!</string>
     <string name="menubutton_profile">Профиль</string>
     <string name="menubutton_settings">Настройка</string>
     <string name="menubutton_exit">Выход</string>
+    <string name="menu_log_out">Выход из аккаунта</string>
+    <string name="menu_sign_in_google_account">Вход в Google аккаунт</string>
+    <string name="menu_profile">Профиль</string>
+    <string name="menu_settings">Настройки</string>
+    <string name="menu_select_language">Выбор языка:</string>
+    <string name="menu_ru">RU</string>
+    <string name="menu_eng">ENG</string>
 
     <string name="levelscreen_easy">Легкий</string>
     <string name="levelscreen_medium">Средний</string>

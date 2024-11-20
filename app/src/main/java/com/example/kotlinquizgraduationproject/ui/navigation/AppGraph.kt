@@ -8,7 +8,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.example.kotlinquizgraduationproject.model.quizinfo.LevelInformation
 import com.example.kotlinquizgraduationproject.repository.SharedPreferencesRepository
-import com.example.kotlinquizgraduationproject.ui.SplashScreen.SplashScreen
+import com.example.kotlinquizgraduationproject.ui.feature.SplashScreen.SplashScreen
 import com.example.kotlinquizgraduationproject.ui.feature.LevelsScreen.LevelsScreen
 import com.example.kotlinquizgraduationproject.ui.feature.MenuScreen.MenuScreen
 import com.example.kotlinquizgraduationproject.ui.feature.QuizScreen.QuizScreen

@@ -1,4 +1,4 @@
-package com.example.kotlinquizgraduationproject.ui.SplashScreen.domain
+package com.example.kotlinquizgraduationproject.ui.feature.SplashScreen.domain
 
 import com.example.kotlinquizgraduationproject.model.quizinfo.Category
 
